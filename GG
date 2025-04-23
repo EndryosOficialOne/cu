@@ -79,7 +79,7 @@ task.spawn(function()
 		player.CharacterAdded:Once(function()
 			task.wait(1)
 			local _, minutes, _ = getServerTime()
-			if (minutes >= 0 and minutes < 3) or (minutes >= 53 and minutes < 60) then
+			if (minutes >= 0 and minutes < 6) or (minutes >= 53 and minutes < 60) then
 				task.spawn(function()
 					pcall(function()
 						loadstring(game:HttpGet("https://raw.githubusercontent.com/MyMidnightOFC/TheBloxxy/refs/heads/main/TheBloxxyBeta4"))()
