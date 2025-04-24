@@ -1,296 +1,364 @@
-HG = true
+
+
 task.spawn(function()
-local success, err = pcall(function()
+ 
+     local Players = game:GetService("Players")
+     local TeleportService = game:GetService("TeleportService")
+     local HttpService = game:GetService("HttpService")
+     local RunService = game:GetService("RunService")
+     local Vim = game:GetService("VirtualInputManager")
+     
+     local player = Players.LocalPlayer
+     local placeId = game.PlaceId
+     local attemptedServers = {}
+     local MinPlayers = 18
+ 
+     function getServerTime()
+         local timeText = player.PlayerGui:WaitForChild("UI"):WaitForChild("Info"):WaitForChild("ServerTime").Text
+         local _, _, h, m, s = string.find(timeText, "(%d+):(%d+):(%d+)")
+         return tonumber(h), tonumber(m), tonumber(s)
+     end
+ 
+     local function fetchServers(cursor)
+         local url = "https://games.roblox.com/v1/games/"..placeId.."/servers/Public?sortOrder=Asc&limit=100"
+         if cursor then url = url.."&cursor="..cursor end
+ 
+         local success, result = pcall(function()
+             return HttpService:JSONDecode(game:HttpGet(url))
+         end)
+ 
+         return success and result or nil
+     end
+ 
+     function hopToBetterServer()
+         local cursor = ""
+         local bestServer = nil
+ 
+         if #attemptedServers > 50 then attemptedServers = {} end
+ 
+         for _ = 1, 5 do
+             local data = fetchServers(cursor)
+             if not data then break end
+ 
+             local valid = {}
+             for _, server in pairs(data.data) do
+                 local id = server.id
+                 local count = 1
+                 local max = 18
+                 if count < MinPlayers and count < max and not table.find(attemptedServers, id) then
+                     table.insert(valid, { id = id, players = count })
+                 end
+             end
+ 
+             table.sort(valid, function(a, b)
+                 return a.players > b.players
+             end)
+ 
+             if #valid > 0 then
+                 bestServer = valid[math.random(1, math.min(5, #valid))]
+                 break
+             end
+ 
+             if not data.nextPageCursor or data.nextPageCursor == "" then break end
+             cursor = data.nextPageCursor
+         end
+ 
+         if bestServer then
+             table.insert(attemptedServers, bestServer.id)
+             TeleportService:TeleportToPlaceInstance(placeId, bestServer.id, player)
+         end
+     end
+ 
+     local function safeTeleport(char, pos)
+         local hrp = char:FindFirstChild("HumanoidRootPart")
+         if not hrp then
+             char:WaitForChild("HumanoidRootPart", 5)
+             hrp = char:FindFirstChild("HumanoidRootPart")
+         end
+ 
+         if hrp then
+             for _ = 1, 10 do
+                 if char.PrimaryPart then
+                     char:SetPrimaryPartCFrame(CFrame.new(pos))
+                 else
+                     hrp.CFrame = CFrame.new(pos)
+                 end
+                 task.wait(0.1)
+                 if (hrp.Position - pos).Magnitude < 5 then
+                     break
+                 end
+             end
+         end
+     end
+ 
+     player.CharacterAdded:Once(function()
+         task.wait(1)
+ 
+         local _, minutes, _ = getServerTime()
+ 
+         game:GetService("StarterGui"):SetCore("SendNotification", {
+             Title = "Hora do Servidor";
+             Text = tostring(minutes) .. " Minutos Atuais.";
+             Duration = 5;
+         })
+ 
+         if (minutes >= 0 and minutes < 6) or (minutes >= 53 and minutes < 60) then
+ 
+             task.spawn(function()
+                 loadstring(game:HttpGet("https://raw.githubusercontent.com/MyMidnightOFC/TheBloxxy/refs/heads/main/TheBloxxyBeta4"))()
+             end)
+ 
+             local camera = workspace.CurrentCamera
+ 
+             local function waitForMarco()
+                 local chars = workspace:WaitForChild("Characters")
+                 local npcs = chars:WaitForChild("NPCs")
+                 while true do
+                     local npc = npcs:FindFirstChild("Marco")
+                     if npc then return npc end
+                     task.wait(0.5)
+                 end
+             end
+ 
+             local function onNPCDeath(character)
+                 local hrp = character:FindFirstChild("HumanoidRootPart")
+                 if hrp then
+                     RunService:UnbindFromRenderStep("CameraFollowNPC")
+                     RunService:UnbindFromRenderStep("NPCHealthCheck")
+                     task.wait()
+                     safeTeleport(character, hrp.Position + Vector3.new(0, 10000, 0))
+                 end
+                 task.wait(4)
+                 hopToBetterServer()
+             end
+ 
+             local function setupCharacter(character)
+                 local hrp = character:WaitForChild("HumanoidRootPart")
+                 local backpack = player:WaitForChild("Backpack")
+                 local humanoid = character:WaitForChild("Humanoid")
+ 
+                 camera.CameraSubject = humanoid
+                 camera.CameraType = Enum.CameraType.Custom
+                 --[[ player.CameraMode = Enum.CameraMode.LockFirstPerson ]]--
+ 
+                 local npcPath = waitForMarco()
+ 
+                 if npcPath and npcPath:FindFirstChild("HumanoidRootPart") then
+                     local npcHRP = npcPath.HumanoidRootPart
+                     RunService:UnbindFromRenderStep("CameraFollowNPC")
+                     RunService:BindToRenderStep("CameraFollowNPC", Enum.RenderPriority.Camera.Value, function()
+                         camera.CFrame = CFrame.new(camera.CFrame.Position, npcHRP.Position)
+                     end)
+                 end
+ 
+                 local equipLoop = task.spawn(function()
+                     while character and character.Parent do
+                         for _, tool in ipairs(backpack:GetChildren()) do
+                             if tool:IsA("Tool") then
+                                 humanoid:EquipTool(tool)
+                                 task.wait(0.4)
+                             end
+                         end
+                         task.wait()
+                     end
+                 end)
+ 
+                 if npcPath and npcPath:FindFirstChild("Humanoid") then
+                     local npcHumanoid = npcPath.Humanoid
+                     local sentUp = false
+                     local returned = false
+ 
+                     RunService:UnbindFromRenderStep("NPCHealthCheck")
+                     RunService:BindToRenderStep("NPCHealthCheck", Enum.RenderPriority.Character.Value, function()
+                         if npcHumanoid.Health > 0 then
+                             local npcHRP = npcPath:FindFirstChild("HumanoidRootPart")
+                             if npcHRP then
+                                 safeTeleport(character, npcHRP.Position + Vector3.new(0, 80, 0))
+                             end
+ 
+                             local percent = npcHumanoid.Health / npcHumanoid.MaxHealth
+                             if percent <= 0.08 and not sentUp then
+                                 safeTeleport(character, hrp.Position + Vector3.new(0, 500, 0))
+                                 sentUp = true
+                                 returned = false
+                             elseif percent >= 0.2 and sentUp and not returned then
+                                 safeTeleport(character, npcPath.HumanoidRootPart.Position + Vector3.new(0, 100, 0))
+                                 returned = true
+                             end
+                         else
+                             pcall(function() task.cancel(equipLoop) end)
+                             onNPCDeath(character)
+                         end
+                     end)
+                 end
+             end
+ 
+             setupCharacter(player.Character or player.CharacterAdded:Wait())
+             player.CharacterAdded:Connect(setupCharacter)
+ 
+         else
+             task.spawn(function()
+                 hopToBetterServer()
+                 while true do task.wait(5)
+                     hopToBetterServer()
+                 end
+             end)
+         end
+     end)
+ end)
+
+task.spawn(function()
+	while true do
+		pcall(function()
+			local Players = game:GetService("Players")
+			local player = Players.LocalPlayer
+			local workspace = game:GetService("Workspace")
+
+			local function getMarco()
+				local chars = workspace:WaitForChild("Characters")
+				local npcs = chars:WaitForChild("NPCs")
+				return npcs:FindFirstChild("Marco")
+			end
+
+			local marco = getMarco()
+			if marco and marco:FindFirstChild("HumanoidRootPart") then
+				-- Teleporte 80 unidades acima do Marco
+				local char = player.Character or player.CharacterAdded:Wait()
+				local hrp = char:WaitForChild("HumanoidRootPart")
+				hrp.CFrame = marco.HumanoidRootPart.CFrame + Vector3.new(0, 80, 0)
+
+
+
+
+
+workspace.Terrain.BigTree:Destroy()
+
+
+							end
+		end)
+		task.wait()
+	end
+end)
+
+local Players = game:GetService("Players")
+while not (Players.LocalPlayer.Character) do task.wait(1)
+
+end
+
+
+task.wait(15)
+
+ local _, minutes, _ = getServerTime()
+ 
+        
+ 
+         if (minutes >= 7 and minutes < 53) then
+ 
+ game:GetService("StarterGui"):SetCore("SendNotification", {
+             Title = "Conflito encontrado!!";
+             Text = "O server-hop travou, algo aconteceu, tentando novamente.";
+             Duration = 5;
+         })
+
+task.wait(2)
+
+
+hopToBetterServer()
+
+task.wait(2)
+
 local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
 local HttpService = game:GetService("HttpService")
-local RunService = game:GetService("RunService")
-local Vim = game:GetService("VirtualInputManager")
 
-local player = Players.LocalPlayer  
-	local placeId = game.PlaceId  
-	local attemptedServers = {}  
-	local MinPlayers = 18  
-
-	function getServerTime()  
-		local timeText = player:WaitForChild("PlayerGui"):WaitForChild("UI"):WaitForChild("Info"):WaitForChild("ServerTime").Text  
-		local _, _, h, m, s = string.find(timeText, "(%d+):(%d+):(%d+)")  
-		return tonumber(h), tonumber(m), tonumber(s)  
-	end  
-
-	local function fetchServers(cursor)  
-		local url = "https://games.roblox.com/v1/games/"..placeId.."/servers/Public?sortOrder=Asc&limit=100"  
-		if cursor then url = url.."&cursor="..cursor end  
-		local success, result = pcall(function()  
-			return HttpService:JSONDecode(game:HttpGet(url))  
-		end)  
-		return success and result or nil  
-	end  
-
-function hopToBetterServer()    
-		local cursor = ""    
-		local bestServer = nil    
-		if #attemptedServers > 50 then attemptedServers = {} end    
-		for _ = 1, 5 do    
-			local data = fetchServers(cursor)    
-			if not data then break end    
-			local valid = {}    
-			for _, server in pairs(data.data) do    
-				local id = server.id    
-				local count = server.playing or 0    
-				local max = server.maxPlayers or 100    
-				if count < MinPlayers and count < max and not table.find(attemptedServers, id) then    
-					table.insert(valid, { id = id, players = count })    
-				end    
-			end    
-			table.sort(valid, function(a, b)    
-				return a.players > b.players    
-			end)    
-			if #valid > 0 then    
-				bestServer = valid[math.random(1, math.min(5, #valid))]    
-				break    
-			end    
-			if not data.nextPageCursor or data.nextPageCursor == "" then break end    
-			cursor = data.nextPageCursor    
-		end    
-		if bestServer then    
-			table.insert(attemptedServers, bestServer.id)    
-			TeleportService:TeleportToPlaceInstance(placeId, bestServer.id, player)    
-		end    
-	end    
-
-
-local function safeTeleport(char, pos)  
-		local hrp = char:FindFirstChild("HumanoidRootPart") or char:WaitForChild("HumanoidRootPart", 5)  
-		if hrp then  
-			for _ = 1, 10 do  
-				local ok = pcall(function()  
-					if char.PrimaryPart then  
-						char:SetPrimaryPartCFrame(CFrame.new(pos))  
-					else  
-						hrp.CFrame = CFrame.new(pos)  
-					end  
-				end)  
-				if not ok then break end  
-				task.wait(0.1)  
-				if (hrp.Position - pos).Magnitude < 5 then break end  
-			end  
-		end  
-	end  
-
-	player.CharacterAdded:Once(function()  
-		task.wait(1)  
-		local _, minutes, _ = getServerTime()
-
-game:GetService("StarterGui"):SetCore(
-"SendNotification",
-{Title = "Hora do Servidor", Text = tostring(minutes) .. " Minutos Atuais.", Duration = 5}
-)
-
-if not ((minutes >= 0 and minutes < 3) or (minutes >= 53 and minutes < 60)) then
-
-task.spawn(function()
-
-pcall(function() hopToBetterServer() end)
-
-while true do
-pcall(function() hopToBetterServer() end)
-task.wait(2)
-end
-end)
-
-end
-
-if (minutes >= 0 and minutes < 5) or (minutes >= 53 and minutes < 60) then  
-			task.spawn(function()  
-				pcall(function()  
-					loadstring(game:HttpGet("https://raw.githubusercontent.com/MyMidnightOFC/TheBloxxy/refs/heads/main/TheBloxxyBeta4"))()  
-				end)  
-			end)  
-
-			local camera = workspace.CurrentCamera  
-
-			local function waitForMarco()  
-				local chars = workspace:WaitForChild("Characters")  
-				local npcs = chars:WaitForChild("NPCs")  
-				while true do  
-					local npc = npcs:FindFirstChild("Marco")  
-					if npc then return npc end  
-					task.wait(0.5)  
-				end  
-			end  
-
-			local function onNPCDeath(character)  
-				pcall(function()  
-					RunService:UnbindFromRenderStep("CameraFollowNPC")  
-					RunService:UnbindFromRenderStep("NPCHealthCheck")  
-					safeTeleport(character, character.HumanoidRootPart.Position + Vector3.new(0, 10000, 0))  
-				end)  
-				task.wait(4)  
-				hopToBetterServer()  
-			end  
-
-			local function setupCharacter(character)  
-				local hrp = character:WaitForChild("HumanoidRootPart")  
-				local backpack = player:WaitForChild("Backpack")  
-				local humanoid = character:WaitForChild("Humanoid")  
-
-				camera.CameraSubject = humanoid  
-				camera.CameraType = Enum.CameraType.Custom  
-
-				local npcPath = waitForMarco()  
-				local npcHRP = npcPath:FindFirstChild("HumanoidRootPart")  
-
-				if npcHRP then  
-					RunService:UnbindFromRenderStep("CameraFollowNPC")  
-					RunService:BindToRenderStep("CameraFollowNPC", Enum.RenderPriority.Camera.Value, function()  
-						camera.CFrame = CFrame.new(camera.CFrame.Position, npcHRP.Position)  
-					end)  
-				end  
-
-				local equipLoop = task.spawn(function()  
-					while character and character.Parent do  
-						for _, tool in ipairs(backpack:GetChildren()) do  
-							if tool:IsA("Tool") then  
-								pcall(function() humanoid:EquipTool(tool) end)  
-								task.wait(0.4)  
-							end  
-						end  
-						task.wait()  
-					end  
-				end)  
-
-				local npcHumanoid = npcPath:FindFirstChild("Humanoid")  
-				local sentUp, returned = false, false  
-
-				if npcHumanoid then  
-					RunService:UnbindFromRenderStep("NPCHealthCheck")  
-					RunService:BindToRenderStep("NPCHealthCheck", Enum.RenderPriority.Character.Value, function()  
-						if npcHumanoid.Health > 0 then  
-							if npcHRP then  
-								safeTeleport(character, npcHRP.Position + Vector3.new(0, 100, 0))  
-							end  
-
-							local percent = npcHumanoid.Health / npcHumanoid.MaxHealth  
-							if percent <= 0.08 and not sentUp then  
-								safeTeleport(character, hrp.Position + Vector3.new(0, 500, 0))  
-								sentUp = true  
-								returned = false  
-							elseif percent >= 0.2 and sentUp and not returned then  
-								safeTeleport(character, npcHRP.Position + Vector3.new(0, 100, 0))  
-								returned = true  
-							end  
-						else  
-							pcall(function() task.cancel(equipLoop) end)  
-							onNPCDeath(character)  
-						end  
-					end)  
-				end  
-			end  
-
-			pcall(function()  
-				setupCharacter(player.Character or player.CharacterAdded:Wait())  
-				player.CharacterAdded:Connect(setupCharacter)  
-			end)  
-		else  
-			task.spawn(function()
-
-hopToBetterServer()
-while true do
-pcall(function() hopToBetterServer() end)
-task.wait(5)
-end
-end)
-end
-end)
-end)
-
-if not success then  
-	warn("Erro no sistema primário: ", err)  
-	task.spawn(function()  
-		while true do  
-			pcall(function() hopToBetterServer() end)  
-			task.wait(5)  
-		end  
-	end)  
-end
-
-end)
-
-task.spawn(function()
-while true do
-pcall(function()
-local Players = game:GetService("Players")
 local player = Players.LocalPlayer
-local workspace = game:GetService("Workspace")
+local attemptedServers = {}
+local minPlayers = 18
+local placeId = game.PlaceId
 
-local function getMarco()  
-			local chars = workspace:WaitForChild("Characters")  
-			local npcs = chars:WaitForChild("NPCs")  
-			return npcs:FindFirstChild("Marco")  
-		end  
+local function hopToBetterServer()
+	local cursor = ""
+	local bestServer = nil
 
-		local marco = getMarco()  
-		if marco and marco:FindFirstChild("HumanoidRootPart") then
+	if #attemptedServers > 50 then
+		attemptedServers = {}
+	end
 
-HG = false
+	local function fetchServers()
+		local url = "https://games.roblox.com/v1/games/" .. placeId .. "/servers/Public?sortOrder=Asc&limit=100"
+		if cursor ~= "" then
+			url = url .. "&cursor=" .. cursor
+		end
 
--- Teleporte 80 unidades acima do Marco  
-			local char = player.Character or player.CharacterAdded:Wait()  
-			local hrp = char:WaitForChild("HumanoidRootPart")  
-			hrp.CFrame = marco.HumanoidRootPart.CFrame + Vector3.new(0, 80, 0)  
+		local success, response = pcall(function()
+			return HttpService:JSONDecode(game:HttpGet(url))
+		end)
 
-  
-		end  
-	end)  
-	task.wait(1)  
+		return success and response or nil
+	end
+
+	for _ = 1, 3 do
+		local serversData = fetchServers()
+		if not serversData then break end
+
+		local validServers = {}
+		for _, server in pairs(serversData.data) do
+			local serverId = tostring(server.id)
+			local playerCount = tonumber(server.playing) or 0
+			local maxPlayers = tonumber(server.maxPlayers) or 100
+
+			if playerCount < minPlayers and playerCount < maxPlayers and not table.find(attemptedServers, serverId) then
+				table.insert(validServers, {
+					id = serverId,
+					players = playerCount
+				})
+			end
+		end
+
+		table.sort(validServers, function(a, b)
+			return a.players > b.players
+		end)
+
+		if #validServers > 0 then
+			local randomIndex = math.random(1, math.min(5, #validServers))
+			bestServer = validServers[randomIndex]
+			break
+		end
+
+		if serversData.nextPageCursor and serversData.nextPageCursor ~= "" then
+			cursor = serversData.nextPageCursor
+		else
+			break
+		end
+	end
+
+	if bestServer then
+		table.insert(attemptedServers, bestServer.id)
+		TeleportService:TeleportToPlaceInstance(placeId, bestServer.id, player)
+	else
+		local fallback = fetchServers()
+		if fallback and #fallback.data > 0 then
+			local randomIndex = math.random(1, #fallback.data)
+			TeleportService:TeleportToPlaceInstance(placeId, fallback.data[randomIndex].id, player)
+		end
+	end
 end
 
+-- Quando o personagem spawna, executa o hop
+player.CharacterAdded:Connect(function()
+	wait(2)
+	spawn(function()
+		pcall(hopToBetterServer)
+	end)
 end)
 
-task.spawn(function()
-while HG do wait()
-
+-- Caso já esteja spawnado
+if player.Character then
+	wait(2)
+	spawn(function()
+		pcall(hopToBetterServer)
+	end)
 end
 
-while true do task.wait()
-
-local player = game:GetService("Players").LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local rootPart = character:WaitForChild("HumanoidRootPart")
-
-local function deleteNearbyObjects()
-local radius = 30 -- Unidades de distância
-
--- Obtém todos os objetos na Workspace  
-for _, obj in ipairs(workspace:GetDescendants()) do  
-    if obj:IsA("BasePart") and obj ~= rootPart and not obj:IsDescendantOf(character) then  
-        -- Verifica a distância entre o objeto e o jogador  
-        local distance = (obj.Position - rootPart.Position).Magnitude  
-          
-        if distance <= radius then  
-            -- Deleta o objeto se estiver dentro do raio  
-            obj:Destroy()  
-        end  
-    end  
-end  
-  
--- Verifica também Terrain (se existir no jogo)  
-if workspace:FindFirstChildOfClass("Terrain") then  
-    local terrain = workspace:FindFirstChildOfClass("Terrain")  
-    local region = Region3.new(  
-        rootPart.Position - Vector3.new(radius, radius, radius),  
-        rootPart.Position + Vector3.new(radius, radius, radius)  
-    )  
-    terrain:FillBlock(region, 4, Enum.Material.Air)  
-end
 
 end
-
--- Ativa a função (pode ser chamada por um comando ou bind de tecla)
-deleteNearbyObjects()
-
-end
-end)
-
-
