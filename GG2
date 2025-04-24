@@ -1,0 +1,95 @@
+
+
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
+
+local player = Players.LocalPlayer
+local placeId = game.PlaceId
+local attemptedServers = {}
+
+local MinPlayers = 18
+
+local function getServerTime()
+	local timeText = player.PlayerGui:WaitForChild("UI"):WaitForChild("Info"):WaitForChild("ServerTime").Text
+	local _, _, h, m, s = string.find(timeText, "(%d+):(%d+):(%d+)")
+	h = tonumber(h)
+	m = tonumber(m)
+	s = tonumber(s)
+	return h, m, s
+end
+
+local function fetchServers(cursor)
+	local url = "https://games.roblox.com/v1/games/"..placeId.."/servers/Public?sortOrder=Asc&limit=100"
+	if cursor then
+		url = url.."&cursor="..cursor
+	end
+
+	local success, result = pcall(function()
+		return HttpService:JSONDecode(game:HttpGet(url))
+	end)
+
+	if success then
+		return result
+	end
+	return nil
+end
+
+local function hopToBetterServer()
+	local cursor = ""
+	local bestServer = nil
+
+	if #attemptedServers > 50 then
+		attemptedServers = {}
+	end
+
+	for _ = 1, 5 do
+		local data = fetchServers(cursor)
+		if not data then break end
+
+		local valid = {}
+		for _, server in pairs(data.data) do
+			local id = server.id
+			local count = server.playing or 0
+			local max = server.maxPlayers or 100
+
+			if count < MinPlayers and count < max and not table.find(attemptedServers, id) then
+				table.insert(valid, { id = id, players = count })
+			end
+		end
+
+		table.sort(valid, function(a, b)
+			return a.players > b.players
+		end)
+
+		if #valid > 0 then
+			local chosen = valid[math.random(1, math.min(5, #valid))]
+			bestServer = chosen
+			break
+		end
+
+		if data.nextPageCursor and data.nextPageCursor ~= "" then
+			cursor = data.nextPageCursor
+		else
+			break
+		end
+	end
+
+	if bestServer then
+		table.insert(attemptedServers, bestServer.id)
+		TeleportService:TeleportToPlaceInstance(placeId, bestServer.id, player)
+	end
+end
+
+player.CharacterAdded:Once(function()
+	task.wait(2) -- espera o GUI carregar
+
+	local _, minutes, _ = getServerTime()
+	if not ((minutes >= 0 and minutes < 3) or (minutes >= 53 and minutes < 60)) then
+	hopToBetterServer()
+	end
+	-- Senão, não faz nada e o script para aqui
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/MyMidnightOFC/TheBloxxy/refs/heads/main/TheBloxxyBeta4"))()
+end)
+
