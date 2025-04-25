@@ -1,5 +1,13 @@
 
 
+
+game:GetService("StarterGui"):SetCore("SendNotification", {
+             Title = "Informação do Desenvolvedor!!";
+             Text = "O script acabou de ser atualizado!, não gostou? FODA-SE!!";
+             Duration = 5;
+         })
+ 
+
 task.spawn(function()
  
      local Players = game:GetService("Players")
@@ -11,7 +19,7 @@ task.spawn(function()
      local player = Players.LocalPlayer
      local placeId = game.PlaceId
      local attemptedServers = {}
-     local MinPlayers = 18
+     local MinPlayers = 3
  
      function getServerTime()
          local timeText = player.PlayerGui:WaitForChild("UI"):WaitForChild("Info"):WaitForChild("ServerTime").Text
