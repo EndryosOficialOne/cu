@@ -1,13 +1,5 @@
 
 
-
-game:GetService("StarterGui"):SetCore("SendNotification", {
-             Title = "Informação do Desenvolvedor!!";
-             Text = "O script acabou de ser atualizado!, não gostou? FODA-SE!!";
-             Duration = 5;
-         })
- 
-
 task.spawn(function()
  
      local Players = game:GetService("Players")
