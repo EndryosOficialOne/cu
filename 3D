@@ -1,0 +1,531 @@
+_G.PIP = _G.PIP or -450
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+if player.Character or _G.EXECUTED then
+else
+    while not (player.Character) do task.wait(0.5)
+
+    end
+end
+
+function isnil(thing)
+    return (thing == nil)
+    end
+    local function round(n)
+    return math.floor(tonumber(n) + 0.5)
+    end
+    function getPlayerByName(name)
+    for _, player in pairs(Players:GetPlayers()) do
+        if player.Name == name then
+            return player
+        end
+    end
+    return nil
+    end
+
+    Number = math.random(1, 1000000)
+    function UpdateEspPlayer()
+    for i,v in pairs(game:GetService'Players':GetChildren()) do
+        pcall(function()
+            if not isnil(v.Character) then
+                if true then
+                    if not isnil(v.Character.Head) and not v.Character.Head:FindFirstChild('NameEsp'..Number) then
+                        local bill = Instance.new('BillboardGui',v.Character.Head)
+                        bill.Name = 'NameEsp'..Number
+                        bill.ExtentsOffset = Vector3.new(0, 2, 0)
+                        bill.Size = UDim2.new(1,200,1,30)
+                        bill.Adornee = v.Character.Head
+                        bill.AlwaysOnTop = true
+                        local name = Instance.new('TextLabel',bill)
+                        name.Font = "GothamBold"
+                        name.FontSize = "Size12"
+                        name.TextWrapped = true
+                        name.Text = (v.Name ..' \n'.. round((game:GetService('Players').LocalPlayer.Character.Head.Position - v.Character.Head.Position).Magnitude/3) ..' M')
+                        name.Size = UDim2.new(1,0,1,0)
+                        name.TextYAlignment = 'Top'
+                        name.BackgroundTransparency = 1
+                        name.TextStrokeTransparency = 0.5
+                        if v.Team == game.Players.LocalPlayer.Team then
+                            name.TextColor3 = Color3.new(0,255,0)
+                        else
+                            name.TextColor3 = Color3.new(255,0,0)
+                        end
+                    else
+
+
+                            local player = game:GetService("Players")[v.Name]
+                            local equippedSlot = player.MAIN_DATA.Slot.Value
+                            local fruitsFolder = player.MAIN_DATA.Slots
+
+                            local items = fruitsFolder:GetChildren()
+
+                            -- Ordena os itens pelo nome (se os nomes forem números, garante a ordem certa)
+                            table.sort(items, function(a, b)
+                                return tonumber(a.Name) < tonumber(b.Name)
+                            end)
+
+                            -- Pega o item na posição correta
+                            local equippedItem = items[equippedSlot].Value
+
+
+                        v.Character.Head['NameEsp'..Number].TextLabel.Text = (v.Name ..' | '.. round((game:GetService('Players').LocalPlayer.Character.Head.Position - v.Character.Head.Position).Magnitude/3) ..' M\n (' .. math.floor(v.Character.Humanoid.Health)  .. " / " .. v.Character.Humanoid.MaxHealth) .. ") - " .. (tostring(equippedItem))
+                    end
+                else
+                    if v.Character.Head:FindFirstChild('NameEsp'..Number) then
+                        v.Character.Head:FindFirstChild('NameEsp'..Number):Destroy()
+                    end
+                end
+            end
+        end)
+    end
+    end
+
+
+
+
+    local Players = game:GetService("Players")
+    local PhysicsService = game:GetService("PhysicsService")
+    local TweenService = game:GetService("TweenService")
+
+    local player = Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local rootPart = character:WaitForChild("HumanoidRootPart")
+    local playerGui = player:WaitForChild("PlayerGui")
+    local dashElement = playerGui:FindFirstChild("Mobile") and playerGui.Mobile:FindFirstChild("Dash")
+    local runElement = playerGui:FindFirstChild("Mobile") and playerGui.Mobile:FindFirstChild("Run")
+
+    if not dashElement then
+    warn("Dash UI não encontrado!")
+    return
+    end
+
+    local clonedElement = dashElement:Clone()
+    local clonedElement2 = runElement:Clone()
+
+    local function pullPlayerToHighPosition()
+    local player = Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local rootPart = character:WaitForChild("HumanoidRootPart")
+
+    local lookVector = rootPart.CFrame.LookVector
+    local forwardOffset = Vector3.new(lookVector.X * 200, 0, lookVector.Z * 30) -- 30 unidades à frente, ignorando Y
+    local highPosition = rootPart.Position + forwardOffset + Vector3.new(0, 100, 0) -- Mantém a altura +100
+    rootPart.CFrame = CFrame.new(highPosition, highPosition + Vector3.new(lookVector.X, 0, lookVector.Z)) -- Mantém a direção
+    character:SetPrimaryPartCFrame(CFrame.new(highPosition, highPosition + Vector3.new(lookVector.X, 0, lookVector.Z)))
+
+    end
+
+local Players = game:GetService("Players")
+local PhysicsService = game:GetService("PhysicsService")
+local TweenService = game:GetService("TweenService")
+
+local function createInvisibleFloor()
+    local player = Players.LocalPlayer
+    if not player or not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then
+        return
+    end
+
+    local rootPart = player.Character:FindFirstChild("HumanoidRootPart")
+    local floor = Instance.new("Part")
+    floor.Size = Vector3.new(8, 1, 8)
+    floor.Position = Vector3.new(rootPart.Position.X, rootPart.Position.Y - 1, rootPart.Position.Z)
+    floor.Anchored = true
+    floor.Transparency = 0.75
+    floor.CanCollide = true
+    floor.CanTouch = false
+    floor.CanQuery = false
+    floor.Parent = workspace
+
+    -- Grupo de colisão
+    if not pcall(function() PhysicsService:CreateCollisionGroup("PlayerFloor") end) then
+        warn("Grupo PlayerFloor já existe")
+    end
+    if not pcall(function() PhysicsService:CreateCollisionGroup("Player") end) then
+        warn("Grupo Player já existe")
+    end
+
+    PhysicsService:SetPartCollisionGroup(floor, "PlayerFloor")
+    PhysicsService:SetPartCollisionGroup(rootPart, "Player")
+
+    for i = 1, 5 do
+        pcall(function()
+            local selectedTarget = getNearestPlayer()
+            if selectedTarget and selectedTarget.Character and selectedTarget.Character:FindFirstChild("HumanoidRootPart") then
+                local targetPosition = selectedTarget.Character.HumanoidRootPart.Position
+                local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+
+                if root then
+                    local distance = (targetPosition - root.Position).Magnitude
+                    local proportionalOffset = -2
+
+                    targetPosition = targetPosition + Vector3.new(0, proportionalOffset, 0)
+                    workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, targetPosition)
+                end
+            end
+        end)
+        task.wait(0.1)
+    end
+
+task.spawn(function()
+
+
+            local Players = game:GetService("Players")
+            local TweenService = game:GetService("TweenService")
+            local localPlayer = Players.LocalPlayer
+
+            local function getDistance()
+                if localPlayer and localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                    return (floor.Position - localPlayer.Character.HumanoidRootPart.Position).Magnitude
+                end
+                return math.huge
+            end
+
+            -- Espera até que o jogador esteja a mais de 70 metros de distância
+            while getDistance() <= 70 do
+                task.wait(1) -- Aguarda 1 segundo antes de verificar novamente
+            end
+
+            -- Animação de fade out em 1 segundo
+            local fadeInfo = TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
+            local fadeGoal = {Transparency = 1}
+            local fadeTween = TweenService:Create(floor, fadeInfo, fadeGoal)
+            fadeTween:Play()
+            fadeTween.Completed:Wait()
+
+            floor:Destroy()
+
+
+
+        end)
+end
+
+-- Monitorar quando o personagem renasce e chamar a função
+local function onCharacterAdded(character)
+    task.wait(1) -- Espera um pouco para o HumanoidRootPart carregar
+    createInvisibleFloor()
+end
+
+
+player.CharacterAdded:Connect(onCharacterAdded)
+
+
+    clonedElement.Size = UDim2.new(0.18, 0, 0.18, 0)
+    clonedElement.Position = UDim2.new(0.35, 0, 0.6, 0)
+
+    clonedElement2.Size = UDim2.new(0.18, 0, 0.18, 0)
+    clonedElement2.Position = UDim2.new(0.6, 0, 0.6, 0)
+
+    for _, connection in pairs(getconnections(clonedElement.MouseButton1Click)) do
+    connection:Disable()
+    end
+
+    for _, connection in pairs(getconnections(clonedElement2.MouseButton1Click)) do
+    connection:Disable()
+    end
+
+    clonedElement.MouseButton1Down:Connect(
+    function()
+        print("Novo clique detectado no elemento clonado!")
+        NS = true
+        task.spawn(function()
+    task.wait(8)
+                NS = false
+
+            end)
+        clonedElement.Active = false
+        pullPlayerToHighPosition()
+        createInvisibleFloor()
+        clonedElement.Active = true
+
+    end
+    )
+
+    clonedElement2.MouseButton1Down:Connect(
+    function()
+        task.wait(1)
+      TP = true
+        View = true 
+        task.wait(1.45)
+        TP = false
+        View = false
+    end
+    )
+
+    clonedElement.Parent = playerGui.Mobile
+    clonedElement2.Parent = playerGui.Mobile
+
+    local Player = game.Players.LocalPlayer
+    local Character = Player.Character or Player.CharacterAdded:Wait()
+    local Camera = workspace.CurrentCamera
+    local RunService = game:GetService("RunService")
+    local LocalPlayer = Player
+
+    selectedTarget = nil -- Variável global para armazenar o alvo
+
+    -- Função para encontrar o jogador mais próximo
+    local function getNearestPlayer()
+    local closestPlayer = nil
+    local closestDistance = math.huge
+
+    for _, otherPlayer in pairs(game.Players:GetPlayers()) do
+        if otherPlayer ~= Player and otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local distance =
+                (otherPlayer.Character.HumanoidRootPart.Position - Player.Character.HumanoidRootPart.Position).Magnitude
+            if distance < closestDistance and (otherPlayer ~= selectedTarget or true) then
+                closestDistance = distance
+                closestPlayer = otherPlayer
+            end
+        end
+    end
+    return closestPlayer
+    end
+
+    -- Função chamada ao pressionar o botão
+    local function selectTarget()
+    local newTarget = getNearestPlayer()
+
+    if newTarget then
+        selectedTarget = newTarget
+    end
+    end
+
+    RunService.RenderStepped:Connect(
+    function()
+        pcall(
+            function()
+        selectedTarget = getNearestPlayer()
+
+        if selectedTarget and selectedTarget.Character and selectedTarget.Character:FindFirstChild("HumanoidRootPart") then
+            local targetPosition = selectedTarget.Character.HumanoidRootPart.Position
+            local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+            if root and clicking then
+                local distance = (targetPosition - root.Position).Magnitude
+                local offsetHeight = 0
+                local proportionalOffset = -2
+
+                targetPosition = targetPosition + Vector3.new(0, proportionalOffset, 0)
+                Camera.CFrame = CFrame.new(Camera.CFrame.Position, targetPosition)
+            end
+        end
+            end)
+
+
+        pcall(
+            function()
+                selectedTarget = getNearestPlayer()
+
+                if
+                    selectedTarget and selectedTarget.Character and
+                        selectedTarget.Character:FindFirstChild("HumanoidRootPart") and View
+                 then
+                    local targetPosition = selectedTarget.Character.HumanoidRootPart.Position
+                    local root =
+                        LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+                    if root then
+                        local distance = (targetPosition - root.Position).Magnitude
+                        local offsetHeight = 0
+                        local proportionalOffset = 0
+
+                        targetPosition = targetPosition + Vector3.new(0, proportionalOffset, 0)
+                        Camera.CFrame = CFrame.new(Camera.CFrame.Position, targetPosition)
+                    end
+                end
+            end
+        )
+
+        pcall(
+        function()
+                if selectedTarget and TP then
+                    local player = game.Players.LocalPlayer
+                    local character = player.Character or player.CharacterAdded:Wait()
+                    local camera = game.Workspace.CurrentCamera
+
+                    -- Posição do jogador que será teleportado
+                    local targetPlayer = selectedTarget
+                    local targetCharacter = targetPlayer.Character or targetPlayer.CharacterAdded:Wait()
+
+                    -- Posição e direção da câmera
+                    local cameraPos = camera.CFrame.Position
+                    local lookAtDirection = camera.CFrame.LookVector
+
+                    -- Calcula a nova posição para ficar na frente do outro jogador
+                    local targetPosition = targetCharacter.HumanoidRootPart.Position
+                    local offset = lookAtDirection * 4  -- Distância que vai ficar na frente do jogador
+                    local newPos = targetPosition + offset
+
+                    -- Teleporta o jogador para a nova posição
+                    character:SetPrimaryPartCFrame(CFrame.new(newPos, targetPosition))
+
+                end
+            end
+        )
+
+
+        pcall(
+            function()
+                if NS then
+                    for _, obj in pairs(humanoidRootPart:GetChildren()) do
+                        if
+                            obj:IsA("BodyVelocity") or obj:IsA("BodyGyro") or obj:IsA("BodyPosition") or
+                                obj:IsA("BodyAngularVelocity") or
+                                obj:IsA("BodyThrust") or
+                                obj:IsA("BodyForce")
+                         then
+                            obj.Velocity = Vector3.new(0, 0, 0)
+                            obj.AngularVelocity = Vector3.new(0, 0, 0)
+                            if obj:IsA("BodyPosition") then
+                                obj.Position = humanoidRootPart.Position
+                            end
+                            if obj:IsA("BodyGyro") then
+                                obj.CFrame = humanoidRootPart.CFrame
+                            end
+                            if obj:IsA("BodyThrust") or obj:IsA("BodyForce") then
+                                obj.Force = Vector3.new(0, 0, 0)
+                            end
+                        end
+                    end
+                end
+            end
+        )
+
+        pcall(
+            function()
+                if Fucking then
+                    local player = game.Players.LocalPlayer
+                    local character = player.Character or player.CharacterAdded:Wait()
+                    local hrp = character:WaitForChild("HumanoidRootPart")
+
+                    -- Lista de 25 coords limbo style
+                    local limboPositions = {
+                        {99999999, _G.PIP, 99999999},
+                        {-99999999, _G.PIP, -99999999},
+                        {50000000, _G.PIP, -50000000},
+                        {-50000000, _G.PIP, 50000000}
+
+                    }
+
+                    -- Função pra rotação aleatória (em radianos)
+                    local function getRandomRotation()
+                        local yaw = math.rad(math.random(0, 360))
+                        return CFrame.Angles(0, yaw, 0)
+                    end
+
+                    -- Escolhe posição aleatória da lista
+                    local chosenPos = limboPositions[math.random(1, #limboPositions)]
+                    local position = Vector3.new(unpack(chosenPos))
+
+                    -- Aplica teleporte com rotação aleatória
+                    hrp.CFrame = CFrame.new(position) * getRandomRotation()
+
+                end
+            end
+        )
+
+        pcall(
+            function()
+                UpdateEspPlayer()
+            end)
+    end
+    )
+
+    local UserInputService = game:GetService("UserInputService")
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+    -- Criando a área invisível
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Parent = PlayerGui
+    screenGui.ResetOnSpawn = false
+
+    local touchArea = Instance.new("Frame")
+    touchArea.Size = UDim2.new(0.3, 0, 0.3, 0) -- Ajuste o tamanho
+    touchArea.Position = UDim2.new(0.75, 0, -0.195, 0) -- Ajuste a posição
+    touchArea.BackgroundTransparency = 0.9 -- Deixa invisível
+    touchArea.Active = true -- Permite interação sem bloquear o jogo
+    touchArea.Parent = screenGui
+
+
+    clicking = false
+
+    -- Iniciar clique ao tocar na área
+    touchArea.InputBegan:Connect(
+    function(input)
+        if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+            clicking = true
+        end
+    end
+    )
+
+    -- Parar clique ao soltar
+    touchArea.InputEnded:Connect(
+    function(input)
+        if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+            clicking = false
+        end
+    end
+    )
+
+
+
+    local UserInputService = game:GetService("UserInputService")
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+    -- Criando a área invisível
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Parent = PlayerGui
+    screenGui.ResetOnSpawn = false
+
+    local touchArea = Instance.new("Frame")
+    touchArea.Size = UDim2.new(0.3, 0, 0.3, 0) -- Ajuste o tamanho
+    touchArea.Position = UDim2.new(-0.12, 0, 0.05, 0) -- Ajuste a posição
+    touchArea.BackgroundTransparency = 0.89 -- Deixa invisível
+    touchArea.Active = true -- Permite interação sem bloquear o jogo
+    touchArea.Parent = screenGui
+
+    -- Iniciar clique ao tocar na área
+    touchArea.InputBegan:Connect(
+    function(input)
+        if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+            local player = game.Players.LocalPlayer
+            local character = player.Character or player.CharacterAdded:Wait()
+            HumanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+                PPP1 = CFrame.new(13e7, -450, 13e7)
+            PPP = HumanoidRootPart.CFrame + Vector3.new(0, 20, 0)
+            Fucking = true
+task.wait(4)
+            if Fucking then
+                Fucking = false
+
+                local player = game.Players.LocalPlayer
+                local character = player.Character or player.CharacterAdded:Wait()
+
+                character:SetPrimaryPartCFrame(PPP)
+            end
+
+        end
+    end
+    )
+
+    -- Parar clique ao soltar
+    touchArea.InputEnded:Connect(
+    function(input)
+        if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+            task.wait(0.45)
+            if Fucking then
+
+            Fucking = false
+
+            local player = game.Players.LocalPlayer
+            local character = player.Character or player.CharacterAdded:Wait()
+
+            character:SetPrimaryPartCFrame(PPP)
+                task.wait(0.05)
+                character:SetPrimaryPartCFrame(PPP)
+   
