@@ -1,5 +1,7 @@
 _G.PIP = _G.PIP or -450
 
+
+
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 if player.Character or _G.EXECUTED then
@@ -528,4 +530,118 @@ task.wait(4)
             character:SetPrimaryPartCFrame(PPP)
                 task.wait(0.05)
                 character:SetPrimaryPartCFrame(PPP)
-   
+character:SetPrimaryPartCFrame(PPP)
+                task.wait(0.05)
+                character:SetPrimaryPartCFrame(PPP)
+                task.wait(0.05)
+                character:SetPrimaryPartCFrame(PPP)
+
+
+            end
+        end
+    end
+    )
+
+
+    task.spawn(function()
+
+        local Players = game:GetService("Players")
+        local UserInputService = game:GetService("UserInputService")
+        local RunService = game:GetService("RunService")
+
+        local player = Players.LocalPlayer
+
+        -- Configurable multipliers
+        local WALK_SPEED_MULTIPLIER = 9.8
+        local JUMP_POWER_MULTIPLIER = 1.9
+
+        local function setupCharacter(character)
+            local humanoid = character:WaitForChild("Humanoid")
+
+            -- Wait for humanoid to be fully loaded
+            while humanoid:GetState() == Enum.HumanoidStateType.GettingUp do
+                task.wait(0.1)
+            end
+
+            -- Get default values
+            local defaultWalkSpeed = humanoid.WalkSpeed
+            local defaultJumpPower = humanoid.JumpPower or 50 -- Fallback if JumpPower doesn't exist
+
+            -- Calculate target values
+            local targetSpeed = defaultWalkSpeed * WALK_SPEED_MULTIPLIER
+            local targetJumpPower = defaultJumpPower * JUMP_POWER_MULTIPLIER
+
+            -- Configure humanoid
+            humanoid.UseJumpPower = true
+
+            -- Connection to maintain speed and jump power
+            local speedMaintainer
+            speedMaintainer = RunService.Heartbeat:Connect(function()
+                if not humanoid or not humanoid.Parent then
+                    speedMaintainer:Disconnect()
+                    return
+                end
+
+                -- Only apply if not ragdolled
+                if humanoid:GetState() ~= Enum.HumanoidStateType.Physics then
+                    humanoid.WalkSpeed = targetSpeed
+                    humanoid.JumpPower = targetJumpPower
+                end
+            end)
+
+            -- Infinite jump
+            local jumpConnection
+            jumpConnection = UserInputService.JumpRequest:Connect(function()
+                if humanoid and humanoid.Parent and humanoid:GetState() ~= Enum.HumanoidStateType.Physics then
+                    humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                end
+            end)
+
+            -- Clean up connections when character is removed
+            character:GetPropertyChangedSignal("Parent"):Connect(function()
+                if not character.Parent then
+                    if speedMaintainer then speedMaintainer:Disconnect() end
+                    if jumpConnection then jumpConnection:Disconnect() end
+                end
+            end)
+        end
+
+        -- Apply to current character
+        if player.Character then
+            setupCharacter(player.Character)
+        end
+
+        -- Apply to new characters
+        player.CharacterAdded:Connect(setupCharacter)
+
+
+    end)
+
+    local uis = game:GetService("UserInputService")
+    local player = game:GetService("Players").LocalPlayer
+    local char = player.Character or player.CharacterAdded:Wait()
+    local humanoid = char:WaitForChild("Humanoid")
+
+    uis.JumpRequest:Connect(
+    function()
+        task.wait() -- Garante que o jogo processe o pulo normal antes de forçar outro
+        if humanoid:GetState() ~= Enum.HumanoidStateType.Seated then
+            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+    )
+
+
+-- Criar a plataforma
+local platform = Instance.new("Part")
+platform.Size = Vector3.new(10000, 2, 10000) -- Tamanho da plataforma
+platform.Anchored = true
+platform.CanCollide = true
+platform.Color = Color3.fromRGB(255, 0, 0) -- Vermelha
+platform.Parent = workspace
+platform.Transparency = 0.75
+
+
+platform.Position = CFrame.new(13e7, -480, 13e7)
+
+_G.EXECUTED = true
