@@ -15,7 +15,7 @@ local rootPart = character:WaitForChild("HumanoidRootPart")
 -- Variáveis de controle
 local FCKING = false
 local PS = nil
-_G.Iper = true
+_G.Iper = false
 
 _G.SPEED1 = 40
 _G.SPEED2 = 1.455
@@ -435,11 +435,6 @@ if mobileGui then
      cloneRun.MouseButton1Down:Connect(function()
 
 
-setClosestPlayerAsTarget()
-
-
-            task.wait(1)
-
 
 
 local icon = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
@@ -463,13 +458,15 @@ end
 
 if _G.Iper then
 _G.SPEED1 = 150
-_G.SPEED2 = 1.8
+_G.SPEED2 = 1.9
+DDY = 1.8
 notify("IPER! ACIONADA!", "Novos poderes foram aprimorados!")
 return
 else
 
 _G.SPEED1 = 40
-_G.SPEED2 = 1.455
+_G.SPEED2 = 1.45
+DDY = 2.2
 notify("Fim!", "Abilidades normalmente...")
 return
 end
@@ -477,8 +474,14 @@ end
 
 end
 
+setClosestPlayerAsTarget()
+
+
+            task.wait(1)
+
+
 _G.XXXY = true
-task.wait(1)
+task.wait(1.5)
 _G.XXXY = false
 
 
@@ -532,24 +535,36 @@ else
     warn("Mobile GUI não encontrado.")
 end
 
-
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
-local function duplicarPulo(char)
-	local humanoid = char:WaitForChild("Humanoid")
-	humanoid.JumpPower = humanoid.JumpPower * 1.5
+-- Espera o character existir antes de definir DDY
+local char = player.Character or player.CharacterAdded:Wait()
+local humanoid = char:WaitForChild("Humanoid")
+local DDY = humanoid.JumpPower * 1.8
+
+function duplicarPulo(character)
+    if not character then return end
+    local hum = character:FindFirstChildOfClass("Humanoid")
+    if hum then
+        hum.JumpPower = DDY
+    end
 end
 
--- Aplica ao personagem atual
-if player.Character then
-	duplicarPulo(player.Character)
-end
-
--- Aplica sempre que respawnar
-player.CharacterAdded:Connect(function(char)
-	duplicarPulo(char)
+-- Conecta ao evento CharacterAdded para quando o character respawnar
+player.CharacterAdded:Connect(function(newChar)
+    char = newChar
+    humanoid = newChar:WaitForChild("Humanoid")
+    DDY = humanoid.JumpPower * 1.8
 end)
+
+task.spawn(function()
+    while true do
+        task.wait(0.5)
+        duplicarPulo(player.Character)
+    end
+end)
+
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -604,7 +619,7 @@ local camera = workspace.CurrentCamera
 local playerGui = player:WaitForChild("PlayerGui")
 
 -- Configuração
-local SENSIBILIDADE = 3 -- quanto maior, mais distante a predição
+local SENSIBILIDADE = 9 -- quanto maior, mais distante a predição
 
 -- UI da área
 local screenGui = Instance.new("ScreenGui", playerGui)
@@ -613,8 +628,8 @@ screenGui.ResetOnSpawn = false
 local touchArea = Instance.new("Frame")
 touchArea.Size = UDim2.new(0.3, 0, 0.3, 0) 
 touchArea.Position = UDim2.new(0.75, 0, -0.195, 0)
-touchArea.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
-touchArea.BackgroundTransparency = 0.4
+touchArea.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+touchArea.BackgroundTransparency = 0.85
 touchArea.Active = true
 touchArea.Parent = screenGui
 
@@ -623,7 +638,7 @@ local tracking = false
 local trackedPlayer = nil
 local lerping = false
 local lerpProgress = 0
-local maxHistory = 15
+local maxHistory = 10
 local historyMap = {} -- player -> posições anteriores
 
 -- Salva as posições dos jogadores em segundo plano
@@ -707,7 +722,7 @@ RunService.RenderStepped:Connect(function(dt)
 		local prediction = predictPosition(trackedPlayer)
 		if prediction then
 			if lerping then
-				lerpProgress += dt * 4
+				lerpProgress += dt * 8
 				if lerpProgress >= 1 then
 					lerping = false
 					lerpProgress = 0
@@ -735,6 +750,7 @@ end)
 -- Terminou toque
 touchArea.InputEnded:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+task.wait(0.65)
 		tracking = false
 		trackedPlayer = nil
 		lerping = false
