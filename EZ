@@ -1,0 +1,579 @@
+-- Serviços
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local StarterGui = game:GetService("StarterGui")
+local PhysicsService = game:GetService("PhysicsService")
+local TweenService = game:GetService("TweenService")
+local Workspace = game:GetService("Workspace")
+
+-- Player e GUI
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+local character = player.Character or player.CharacterAdded:Wait()
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+-- Variáveis de controle
+local FCKING = false
+local PS = nil
+_G.Iper = true
+
+_G.SPEED1 = 40
+_G.SPEED2 = 1.455
+
+-- Criar área invisível de toque
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = playerGui
+screenGui.ResetOnSpawn = false
+
+local touchArea = Instance.new("Frame")
+touchArea.Size = UDim2.new(0.3, 0, 0.3, 0)
+touchArea.Position = UDim2.new(-0.12, 0, 0.05, 0)
+touchArea.BackgroundTransparency = 0.8
+touchArea.Active = true
+touchArea.Parent = screenGui
+
+
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local function onCharacterAdded(char)
+    local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local StarterGui = game:GetService("StarterGui")
+
+local player = Players.LocalPlayer
+local camera = workspace.CurrentCamera
+local gui = player:WaitForChild("PlayerGui")
+local frame = gui:WaitForChild("TouchGui"):WaitForChild("TouchControlFrame")
+local dyn = frame:WaitForChild("DynamicThumbstickFrame")
+local thumbStart = dyn:WaitForChild("ThumbstickStart")
+local thumbEnd = dyn:WaitForChild("ThumbstickEnd")
+
+local char = player.Character or player.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
+local humanoid = char:WaitForChild("Humanoid")
+
+-- CONFIG
+MAX_SPEED = _G.SPEED1
+STEP_SIZE = _G.SPEED2
+local ACCELERATION = 1.5
+local DECELERATION = 2.5 -- Desaceleração mais rápida que a aceleração
+local TURN_SMOOTHNESS = 12 -- Suavização da rotação
+local MOVEMENT_SMOOTHNESS = 15 -- Suavização do movimento
+local MIN_MOVEMENT_THRESHOLD = 0.1 -- Threshold para considerar movimento
+
+-- VARS
+local currentVelocity = Vector3.zero
+local targetVelocity = Vector3.zero
+local stepMultiplier = 0
+local lastText = ""
+local lastDirection = Vector3.zero
+
+-- DIREÇÃO VISUAL (mantido igual)
+local function getDirectionArrow(vec)
+    if vec.Magnitude < 0.1 then
+        return "⏹️ Parado"
+    end
+
+    local angle = math.atan2(vec.Z, vec.X)  
+    local deg = math.atan2(vec.Z, vec.X)  
+    local deg = math.deg(angle)  
+
+    if deg >= -22.5 and deg < 22.5 then return "→" end  
+    if deg >= 22.5 and deg < 67.5 then return "↗️" end  
+    if deg >= 67.5 and deg < 112.5 then return "↑" end  
+    if deg >= 112.5 and deg < 157.5 then return "↖️" end  
+    if deg >= 157.5 or deg < -157.5 then return "←" end  
+    if deg >= -157.5 and deg < -112.5 then return "↙️" end  
+    if deg >= -112.5 and deg < -67.5 then return "↓" end  
+    if deg >= -67.5 and deg < -22.5 then return "↘️" end
+end
+
+-- MOVE DIRECTION REAL (mantido igual)
+local function getManualMoveDirection()
+    if thumbEnd.ImageTransparency == 1 then
+        return Vector3.zero
+    end
+
+    local dx = thumbEnd.Position.X.Offset - thumbStart.Position.X.Offset  
+    local dy = thumbEnd.Position.Y.Offset - thumbStart.Position.Y.Offset  
+
+    if dx ~= dx then dx = 0 end  
+    if dy ~= dy then dy = 0 end  
+
+    local moveVec = Vector3.new(dx, 0, -dy)  
+    local camCF = camera.CFrame  
+    local dir = camCF.RightVector * moveVec.X + camCF.LookVector * moveVec.Z  
+    dir = Vector3.new(dir.X, 0, dir.Z)  
+
+    if dir.Magnitude == 0 or dir.Magnitude ~= dir.Magnitude then  
+        return Vector3.zero  
+    end  
+
+    return dir.Unit
+end
+
+-- LOOP PRINCIPAL
+RunService.Heartbeat:Connect(function(dt)
+
+MAX_SPEED = _G.SPEED1
+STEP_SIZE = _G.SPEED2
+
+    -- Obter direção do input
+    local inputDirection = getManualMoveDirection()
+    local isMoving = inputDirection.Magnitude > MIN_MOVEMENT_THRESHOLD
+    
+    -- Atualizar seta de direção
+    local arrow = getDirectionArrow(inputDirection)  
+    if arrow ~= lastText then  
+        lastText = arrow  
+    end
+    
+    -- Calcular velocidade alvo
+    if isMoving then
+        targetVelocity = inputDirection * MAX_SPEED
+        lastDirection = inputDirection -- Guardar última direção para inércia
+    else
+        targetVelocity = Vector3.zero
+    end
+    
+    -- Aplicar aceleração/desaceleração suave
+    local acceleration = isMoving and ACCELERATION or DECELERATION
+    currentVelocity = currentVelocity:Lerp(
+        targetVelocity, 
+        math.clamp(dt * acceleration * MOVEMENT_SMOOTHNESS, 0, 1)
+    )
+    
+    -- Aplicar velocidade ao personagem
+    hrp.Velocity = Vector3.new(currentVelocity.X, hrp.Velocity.Y, currentVelocity.Z)
+    
+    -- Rotação suave na direção do movimento
+    if isMoving and false then
+        local targetCFrame = CFrame.lookAt(hrp.Position, hrp.Position + inputDirection)
+        hrp.CFrame = hrp.CFrame:Lerp(targetCFrame, math.clamp(dt * TURN_SMOOTHNESS, 0, 1))
+    end
+    
+    -- Efeito de passo (bounce)
+    if isMoving then
+        stepMultiplier = math.clamp(stepMultiplier + dt * ACCELERATION * 1.4, 0, 1)
+    else
+        stepMultiplier = math.clamp(stepMultiplier - dt * DECELERATION * 1.6, 0, 1)
+    end
+    
+    -- Aplicar pequeno movimento vertical para simular passos
+    local offset = inputDirection * STEP_SIZE * stepMultiplier
+    hrp.CFrame = hrp.CFrame + offset
+end)
+end
+
+if player.Character then
+    onCharacterAdded(player.Character) -- executa se já tiver personagem
+end
+
+player.CharacterAdded:Connect(onCharacterAdded) -- executa sempre que renascer
+
+
+ 
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
+local function isnil(val)
+	return val == nil
+end
+
+local function round(n)
+	return math.floor(tonumber(n) + 0.5)
+end
+
+local function createESP(player)
+	local head = player.Character and player.Character:FindFirstChild("Head")
+	if not head then return end
+
+	local existingESP = head:FindFirstChild("NameEsp")
+	if not existingESP then
+		local bill = Instance.new("BillboardGui", head)
+		bill.Name = "NameEsp"
+		bill.ExtentsOffset = Vector3.new(0, 2, 0)
+		bill.Size = UDim2.new(1, 200, 1, 30)
+		bill.Adornee = head
+		bill.AlwaysOnTop = true
+
+		local nameLabel = Instance.new("TextLabel", bill)
+		nameLabel.Name = "TextLabel"
+		nameLabel.Font = Enum.Font.GothamBold
+		nameLabel.TextWrapped = true
+		nameLabel.Size = UDim2.new(1, 0, 1, 0)
+		nameLabel.TextYAlignment = Enum.TextYAlignment.Top
+		nameLabel.BackgroundTransparency = 1
+		nameLabel.TextStrokeTransparency = 0.5
+	end
+end
+
+local function updateESP()
+	for _, player in pairs(Players:GetPlayers()) do
+		if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
+			createESP(player)
+
+			local head = player.Character.Head
+			local espGui = head:FindFirstChild("NameEsp")
+			if espGui and espGui:FindFirstChild("TextLabel") then
+				local distance = (LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Head")) and (LocalPlayer.Character.Head.Position - head.Position).Magnitude / 3 or 0
+				local health = player.Character:FindFirstChild("Humanoid")
+				local healthText = health and ("(" .. math.floor(health.Health) .. " / " .. math.floor(health.MaxHealth) .. ")") or ""
+
+				local equippedItem = "???"
+				local success, err = pcall(function()
+					local slot = player:FindFirstChild("MAIN_DATA") and player.MAIN_DATA:FindFirstChild("Slot")
+					local slots = player.MAIN_DATA and player.MAIN_DATA:FindFirstChild("Slots")
+					if slot and slots then
+						local items = slots:GetChildren()
+						table.sort(items, function(a, b)
+							return tonumber(a.Name) < tonumber(b.Name)
+						end)
+						local equipped = items[slot.Value]
+						equippedItem = equipped and equipped.Value or "N/A"
+					end
+				end)
+
+				local teamColor = player.Team == LocalPlayer.Team and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+
+espGui.TextLabel.FontSize = "Size10"
+				espGui.TextLabel.TextColor3 = teamColor
+				espGui.TextLabel.Text = ("%s | %.0f M\n%s - %s"):format(player.Name, distance, healthText, equippedItem)
+			end
+		end
+	end
+end
+
+-- Atualiza a ESP constantemente
+RunService.RenderStepped:Connect(updateESP)
+
+-- Aplica ESP em quem entrar
+Players.PlayerAdded:Connect(function(player)
+	player.CharacterAdded:Connect(function()
+		wait(1)
+		createESP(player)
+	end)
+end)
+
+-- Aplica ESP nos players já presentes
+for _, player in pairs(Players:GetPlayers()) do
+	if player ~= LocalPlayer then
+		if player.Character then
+			createESP(player)
+		end
+		player.CharacterAdded:Connect(function()
+			wait(1)
+			createESP(player)
+		end)
+	end
+end
+
+
+-- Notificação helper
+local function notify(title, text)
+    StarterGui:SetCore("SendNotification", {Title = title, Text = text, Duration = 3})
+end
+
+-- Touch começa
+touchArea.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+        if not PS then
+            local char = player.Character or player.CharacterAdded:Wait()
+            local hrp = char:WaitForChild("HumanoidRootPart")
+            PS = hrp.CFrame + Vector3.new(0, 20, 0)
+            
+        end
+        FCKING = true
+       
+    end
+end)
+
+-- Touch termina
+touchArea.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+task.wait(0.6)
+        FCKING = false
+for i = 1, 5 do
+task.wait(0.06)
+        if PS then
+            local char = player.Character or player.CharacterAdded:Wait()
+            char:SetPrimaryPartCFrame(PS)
+            
+        end
+end
+PS = nil
+
+    end
+end)
+
+-- Fundo de cor que fica girando a vibe
+local tempoTotal = 5
+local t = 0
+RunService.RenderStepped:Connect(function(dt)
+    t = t + dt
+    local p = (t % tempoTotal) / tempoTotal * math.pi * 2
+    touchArea.BackgroundColor3 = Color3.new(
+        0.5 + 0.5 * math.sin(p),
+        0.5 + 0.5 * math.sin(p + 2),
+        0.5 + 0.5 * math.sin(p + 4)
+    )
+end)
+
+-- Lista de posições insanas pra teleporte
+local posicoes = {
+    Vector3.new(1e6, -490, 1e6),
+	Vector3.new(-1e6, -490, 1e6),
+	Vector3.new(1e6, -490, -1e6),
+	Vector3.new(-1e6, -490, -1e6),
+	Vector3.new(5e5, -490, 0),
+	Vector3.new(-5e5, -490, 0),
+	Vector3.new(0, -490, 5e5),
+	Vector3.new(0, -490, -5e5),
+	Vector3.new(123456, -490, 654321),
+	Vector3.new(-123456, -490, -654321),
+	Vector3.new(888888, -490, 444444),
+	Vector3.new(-888888, -490, -444444),
+	Vector3.new(777777, -490, 333333),
+	Vector3.new(-777777, -480, -333333),
+	Vector3.new(111111, -490, 222222),
+	Vector3.new(-111111, -480, -222222),
+	Vector3.new(696969, -490, 969696),
+	Vector3.new(-696969, -490, -969696),
+	Vector3.new(420420, -490, 420420),
+	Vector3.new(-420420, -490, -420420),
+}
+
+-- Teleporte louco com base de proteção
+local baseAtiva = false
+RunService.Heartbeat:Connect(function()
+    if FCKING then
+        local char = player.Character or player.CharacterAdded:Wait()
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            local pos = posicoes[math.random(1, #posicoes)]
+            local rot = math.rad(math.random(0, 360))
+            hrp.CFrame = CFrame.new(pos) * CFrame.Angles(0, rot, 0)
+            hrp.Velocity = Vector3.zero
+            hrp.RotVelocity = Vector3.zero
+
+            if not baseAtiva then
+                local base = Instance.new("Part")
+                base.Anchored = true
+                base.Size = Vector3.new(10, 2, 10)
+                base.Position = Vector3.new(pos.X, pos.Y - 5, pos.Z)
+                base.Transparency = 0.5
+                base.Color = Color3.new(1, 0, 0)
+                base.Material = Enum.Material.Neon
+                base.Name = "SafeBase"
+                base.Parent = Workspace
+                game.Debris:AddItem(base, 10)
+                
+            end
+        end
+    end
+end)
+
+-- Se cair do mapa, teleporta pra cima
+RunService.RenderStepped:Connect(function()
+    local char = player.Character or player.CharacterAdded:Wait()
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if hrp and not FCKING and hrp.Position.Y < 0 then
+        hrp.CFrame = CFrame.new(0, 600, 0)
+        
+    end
+end)
+
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local function setClosestPlayerAsTarget()
+	local character = LocalPlayer.Character
+	if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+
+	local closestPlayer = nil
+	local shortestDistance = math.huge
+
+	for _, player in ipairs(Players:GetPlayers()) do
+		if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+			local distance = (character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
+			if distance < shortestDistance then
+				shortestDistance = distance
+				closestPlayer = player
+			end
+		end
+	end
+
+	if closestPlayer then
+		_G.TARGET_PLAYER = closestPlayer.Name
+	end
+end
+
+
+
+-- Botão clonado que teleporta o player pra cima com chão invisível
+local mobileGui = playerGui:FindFirstChild("Mobile")
+if mobileGui then
+    local dashButton = mobileGui:FindFirstChild("Dash")
+    local runButton = mobileGui:FindFirstChild("Run")
+
+    if dashButton and runButton then
+        local cloneDash = dashButton:Clone()
+        cloneDash.Size = UDim2.new(0.18, 0, 0.18, 0)
+        cloneDash.Position = UDim2.new(0.35, 0, 0.6, 0)
+        cloneDash.Parent = mobileGui
+
+        local cloneRun = runButton:Clone()
+        cloneRun.Size = UDim2.new(0.18, 0, 0.18, 0)
+        cloneRun.Position = UDim2.new(0.6, 0, 0.6, 0)
+        cloneRun.Parent = mobileGui
+
+                  
+     cloneRun.MouseButton1Down:Connect(function()
+
+
+setClosestPlayerAsTarget()
+
+
+            task.wait(1)
+
+
+
+local icon = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+    :WaitForChild("Mobile"):WaitForChild("Block"):WaitForChild("Icon")
+
+local color = icon.ImageColor3
+local resultado = (color.r == 0 and color.g == 0 and color.b == 0) -- true se preto
+
+
+if resultado then
+if _G.Iper then
+
+_G.Iper = false
+else
+_G.Iper = true
+end
+
+
+
+
+
+if _G.Iper then
+_G.SPEED1 = 150
+_G.SPEED2 = 1.8
+notify("IPER! ACIONADA!", "Novos poderes foram aprimorados!")
+return
+else
+
+_G.SPEED1 = 40
+_G.SPEED2 = 1.455
+notify("Fim!", "Abilidades normalmente...")
+return
+end
+
+
+end
+
+_G.XXXY = true
+task.wait(1)
+_G.XXXY = false
+
+
+end)
+
+     cloneDash.MouseButton1Down:Connect(function()
+            
+
+cloneDash.Active = false
+            local char = player.Character or player.CharacterAdded:Wait()
+            local hrp = char:WaitForChild("HumanoidRootPart")
+            local lookVector = hrp.CFrame.LookVector
+            local forwardOffset = Vector3.new(lookVector.X * 200, 0, lookVector.Z * 30)
+            local highPos = hrp.Position + forwardOffset + Vector3.new(0, 100, 0)
+            local newCf = CFrame.new(highPos, highPos + Vector3.new(lookVector.X, 0, lookVector.Z))
+            char:SetPrimaryPartCFrame(newCf)
+
+            -- Chão invisível
+            local floor = Instance.new("Part")
+            floor.Size = Vector3.new(8, 1, 8)
+            floor.Position = hrp.Position - Vector3.new(0, 1, 0)
+            floor.Anchored = true
+            floor.Transparency = 0.75
+            floor.CanCollide = true
+            floor.Parent = Workspace
+
+            pcall(function()
+                PhysicsService:CreateCollisionGroup("PlayerFloor")
+                PhysicsService:CreateCollisionGroup("Player")
+            end)
+            PhysicsService:SetPartCollisionGroup(floor, "PlayerFloor")
+            PhysicsService:SetPartCollisionGroup(hrp, "Player")
+
+            task.spawn(function()
+                while (floor.Position - hrp.Position).Magnitude <= 70 do
+                    task.wait(1)
+                end
+                local fadeTween = TweenService:Create(floor, TweenInfo.new(1), {Transparency = 1})
+                fadeTween:Play()
+                fadeTween.Completed:Wait()
+                floor:Destroy()
+            end)
+
+            cloneDash.Active = true
+
+        end)
+    else
+        warn("Botões Dash ou Run não encontrados.")
+    end
+else
+    warn("Mobile GUI não encontrado.")
+end
+
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local function duplicarPulo(char)
+	local humanoid = char:WaitForChild("Humanoid")
+	humanoid.JumpPower = humanoid.JumpPower * 1.5
+end
+
+-- Aplica ao personagem atual
+if player.Character then
+	duplicarPulo(player.Character)
+end
+
+-- Aplica sempre que respawnar
+player.CharacterAdded:Connect(function(char)
+	duplicarPulo(char)
+end)
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Heartbeat = RunService.Heartbeat
+
+_G.XXXY = false
+
+local lastTargetPos = nil
+
+Heartbeat:Connect(function()
+	if not _G.XXXY then return end
+
+	local character = LocalPlayer.Character
+	if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+
+	local targetPlayer = Players:FindFirstChild(_G.TARGET_PLAYER)
+	if not targetPlayer or not targetPlayer.Character or not targetPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
+
+	local targetPos = targetPlayer.Character.HumanoidRootPart.Position
+	local currentPos = character.HumanoidRootPart.Position
+
+	if (currentPos - targetPos).Magnitude > 1 then
+		character:SetPrimaryPartCFrame(CFrame.new(targetPos))
+		lastTargetPos = targetPos
+	end
+end)
