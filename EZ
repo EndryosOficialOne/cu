@@ -22,9 +22,10 @@ _G.SPEED2 = 1.455
 
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
-
+char = player.Character
 	local humanoid = char:WaitForChild("Humanoid")
 DDY = humanoid.JumpPower * 1.8
+
 -- Criar área invisível de toque
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = playerGui
