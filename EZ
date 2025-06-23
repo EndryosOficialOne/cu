@@ -20,7 +20,11 @@ _G.Iper = false
 _G.SPEED1 = 40
 _G.SPEED2 = 1.455
 
-DDY = 1.8
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+	local humanoid = char:WaitForChild("Humanoid")
+DDY = humanoid.JumpPower * 1.8
 -- Criar área invisível de toque
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = playerGui
@@ -460,7 +464,7 @@ end
 if _G.Iper then
 _G.SPEED1 = 150
 _G.SPEED2 = 1.9
-DDY = 1.8
+DDY = humanoid.JumpPower * 1.8
 
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
@@ -482,7 +486,8 @@ else
 
 _G.SPEED1 = 40
 _G.SPEED2 = 1.45
-DDY = 2.5
+DDY = humanoid.JumpPower * 2.5
+
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
