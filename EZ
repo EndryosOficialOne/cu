@@ -20,6 +20,7 @@ _G.Iper = false
 _G.SPEED1 = 40
 _G.SPEED2 = 1.455
 
+DDY = 1.8
 -- Criar área invisível de toque
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = playerGui
@@ -460,13 +461,41 @@ if _G.Iper then
 _G.SPEED1 = 150
 _G.SPEED2 = 1.9
 DDY = 1.8
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local function duplicarPulo(char)
+	local humanoid = char:WaitForChild("Humanoid")
+	humanoid.JumpPower = humanoid.JumpPower * 1.8
+end
+
+-- Aplica ao personagem atual
+if player.Character then
+	duplicarPulo(player.Character)
+end
+
+
 notify("IPER! ACIONADA!", "Novos poderes foram aprimorados!")
 return
 else
 
 _G.SPEED1 = 40
 _G.SPEED2 = 1.45
-DDY = 2.2
+DDY = 2.5
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local function duplicarPulo(char)
+	local humanoid = char:WaitForChild("Humanoid")
+	humanoid.JumpPower = 2.5
+end
+
+-- Aplica ao personagem atual
+if player.Character then
+	duplicarPulo(player.Character)
+end
+
 notify("Fim!", "Abilidades normalmente...")
 return
 end
@@ -538,31 +567,22 @@ end
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
--- Espera o character existir antes de definir DDY
-local char = player.Character or player.CharacterAdded:Wait()
-local humanoid = char:WaitForChild("Humanoid")
-local DDY = humanoid.JumpPower * 1.8
+-- Elocal Players = game:GetService("Players")
+local player = Players.LocalPlayer
 
-function duplicarPulo(character)
-    if not character then return end
-    local hum = character:FindFirstChildOfClass("Humanoid")
-    if hum then
-        hum.JumpPower = DDY
-    end
+local function duplicarPulo(char)
+	local humanoid = char:WaitForChild("Humanoid")
+	humanoid.JumpPower = DDY
 end
 
--- Conecta ao evento CharacterAdded para quando o character respawnar
-player.CharacterAdded:Connect(function(newChar)
-    char = newChar
-    humanoid = newChar:WaitForChild("Humanoid")
-    DDY = humanoid.JumpPower * 1.8
-end)
+-- Aplica ao personagem atual
+if player.Character then
+	duplicarPulo(player.Character)
+end
 
-task.spawn(function()
-    while true do
-        task.wait(0.5)
-        duplicarPulo(player.Character)
-    end
+-- Aplica sempre que respawnar
+player.CharacterAdded:Connect(function(char)
+	duplicarPulo(char)
 end)
 
 
