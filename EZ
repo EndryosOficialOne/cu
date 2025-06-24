@@ -444,7 +444,7 @@ if mobileGui then
 
 
 local icon = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
-    :WaitForChild("Mobile"):WaitForChild("Run"):WaitForChild("Icon")
+    :WaitForChild("Mobile"):WaitForChild("Jump"):WaitForChild("Icon")
 
 local color = icon.ImageColor3
 local resultado = (color.r == 0 and color.g == 0 and color.b == 0) -- true se preto
@@ -456,8 +456,11 @@ GGHI = not (GGHI)
 
 if GGHI then
 
+notify("Aimbot Inteligente Inativo.", "Pelo visto você não gostou disto :(")
 SENSIBILIDADE = 0
 else
+
+notify("Aimbot Ativo!", "Vou analizar o jogador mais consciente.")
 SENSIBILIDADE = 9
 end
 
