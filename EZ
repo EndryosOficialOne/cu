@@ -16,6 +16,7 @@ local rootPart = character:WaitForChild("HumanoidRootPart")
 local FCKING = false
 local PS = nil
 _G.Iper = false
+GGHI = false
 
 _G.SPEED1 = 40
 _G.SPEED2 = 1.455
@@ -442,6 +443,25 @@ if mobileGui then
 
 
 
+local icon = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+    :WaitForChild("Mobile"):WaitForChild("Run"):WaitForChild("Icon")
+
+local color = icon.ImageColor3
+local resultado = (color.r == 0 and color.g == 0 and color.b == 0) -- true se preto
+
+
+if resultado then
+
+GGHI = not (GGHI)
+
+if GGHI then
+
+SENSIBILIDADE = 0
+else
+SENSIBILIDADE = 9
+end
+
+end
 
 local icon = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
     :WaitForChild("Mobile"):WaitForChild("Block"):WaitForChild("Icon")
@@ -487,14 +507,14 @@ else
 
 _G.SPEED1 = 40
 _G.SPEED2 = 1.45
-DDY = humanoid.JumpPower * 2.5
+DDY = humanoid.JumpPower * 3
 
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
 local function duplicarPulo(char)
 	local humanoid = char:WaitForChild("Humanoid")
-	humanoid.JumpPower = 2.5
+	humanoid.JumpPower = 3
 end
 
 -- Aplica ao personagem atual
@@ -645,7 +665,7 @@ local camera = workspace.CurrentCamera
 local playerGui = player:WaitForChild("PlayerGui")
 
 -- Configuração
-local SENSIBILIDADE = 9 -- quanto maior, mais distante a predição
+SENSIBILIDADE = 9 -- quanto maior, mais distante a predição
 
 -- UI da área
 local screenGui = Instance.new("ScreenGui", playerGui)
@@ -664,7 +684,7 @@ local tracking = false
 local trackedPlayer = nil
 local lerping = false
 local lerpProgress = 0
-local maxHistory = 10
+local maxHistory = 20
 local historyMap = {} -- player -> posições anteriores
 
 -- Salva as posições dos jogadores em segundo plano
