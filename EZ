@@ -5,6 +5,8 @@ local StarterGui = game:GetService("StarterGui")
 local PhysicsService = game:GetService("PhysicsService")
 local TweenService = game:GetService("TweenService")
 local Workspace = game:GetService("Workspace")
+D2 = 0
+DD2 = 0
 
 -- Player e GUI
 local player = Players.LocalPlayer
@@ -15,17 +17,24 @@ local rootPart = character:WaitForChild("HumanoidRootPart")
 -- Variáveis de controle
 local FCKING = false
 local PS = nil
-_G.Iper = false
+_G.Iper = true
 GGHI = false
 
 _G.SPEED1 = 40
 _G.SPEED2 = 1.455
 
+
+if game.PlaceId == 16190471004 then
+
+DD2 = -4100
+end
+
+
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 char = player.Character
 	local humanoid = char:WaitForChild("Humanoid")
-DDY = humanoid.JumpPower * 1.8
+DDY = 120
 
 -- Criar área invisível de toque
 local screenGui = Instance.new("ScreenGui")
@@ -328,9 +337,8 @@ RunService.RenderStepped:Connect(function(dt)
         0.5 + 0.5 * math.sin(p + 4)
     )
 end)
-
 -- Lista de posições insanas pra teleporte
-local posicoes = {
+posicoes = {
     Vector3.new(1e6, -490, 1e6),
 	Vector3.new(-1e6, -490, 1e6),
 	Vector3.new(1e6, -490, -1e6),
@@ -344,14 +352,42 @@ local posicoes = {
 	Vector3.new(888888, -490, 444444),
 	Vector3.new(-888888, -490, -444444),
 	Vector3.new(777777, -490, 333333),
-	Vector3.new(-777777, -480, -333333),
+	Vector3.new(-777777, -490, -333333),
 	Vector3.new(111111, -490, 222222),
-	Vector3.new(-111111, -480, -222222),
+	Vector3.new(-111111, -490, -222222),
 	Vector3.new(696969, -490, 969696),
 	Vector3.new(-696969, -490, -969696),
 	Vector3.new(420420, -490, 420420),
 	Vector3.new(-420420, -490, -420420),
 }
+
+
+if game.PlaceId == 16190471004 then
+-- Lista de posições insanas pra teleporte
+posicoes = {
+    Vector3.new(1e6, -4900, 1e6),
+	Vector3.new(-1e6, -4900, 1e6),
+	Vector3.new(1e6, -4900, -1e6),
+	Vector3.new(-1e6, -4900, -1e6),
+	Vector3.new(5e5, -4900, 0),
+	Vector3.new(-5e5, -4900, 0),
+	Vector3.new(0, -4900, 5e5),
+	Vector3.new(0, -4900, -5e5),
+	Vector3.new(123456, -4900, 654321),
+	Vector3.new(-123456, -4900, -654321),
+	Vector3.new(888888, -4900, 444444),
+	Vector3.new(-888888, -4900, -444444),
+	Vector3.new(777777, -4900, 333333),
+	Vector3.new(-777777, -4900, -333333),
+	Vector3.new(111111, -4900, 222222),
+	Vector3.new(-111111, -4900, -222222),
+	Vector3.new(696969, -4900, 969696),
+	Vector3.new(-696969, -4900, -969696),
+	Vector3.new(420420, -4900, 420420),
+	Vector3.new(-420420, -4900, -420420),
+}
+
+end
 
 -- Teleporte louco com base de proteção
 local baseAtiva = false
@@ -387,8 +423,8 @@ end)
 RunService.RenderStepped:Connect(function()
     local char = player.Character or player.CharacterAdded:Wait()
     local hrp = char:FindFirstChild("HumanoidRootPart")
-    if hrp and not FCKING and hrp.Position.Y < 0 then
-        hrp.CFrame = CFrame.new(0, 600, 0)
+    if hrp and not FCKING and hrp.Position.Y < (0 + DD2) then
+        hrp.CFrame = CFrame.new(400, 1200, 0)
         
     end
 end)
@@ -486,16 +522,16 @@ end
 
 
 if _G.Iper then
-_G.SPEED1 = 150
-_G.SPEED2 = 1.9
-DDY = humanoid.JumpPower * 1.8
+_G.SPEED1 = 40
+_G.SPEED2 = 1.4
+DDY = 120
 
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
 local function duplicarPulo(char)
 	local humanoid = char:WaitForChild("Humanoid")
-	humanoid.JumpPower = humanoid.JumpPower * 1.8
+	humanoid.JumpPower = 120
 end
 
 -- Aplica ao personagem atual
@@ -504,20 +540,21 @@ if player.Character then
 end
 
 
-notify("IPER! ACIONADA!", "Novos poderes foram aprimorados!")
+notify("Fim!", "Abilidades normalmente...")
+
 return
 else
 
-_G.SPEED1 = 40
-_G.SPEED2 = 1.45
-DDY = humanoid.JumpPower * 3
+_G.SPEED1 = 165
+_G.SPEED2 = 2.25
+DDY = 200
 
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
 local function duplicarPulo(char)
 	local humanoid = char:WaitForChild("Humanoid")
-	humanoid.JumpPower = 3
+	humanoid.JumpPower = 200
 end
 
 -- Aplica ao personagem atual
@@ -525,7 +562,8 @@ if player.Character then
 	duplicarPulo(player.Character)
 end
 
-notify("Fim!", "Abilidades normalmente...")
+notify("IPER! ACIONADA!", "Novos poderes foram aprimorados!")
+
 return
 end
 
