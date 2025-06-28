@@ -1,3 +1,10 @@
+local player = game.Players.LocalPlayer
+
+while not player.Character do
+	task.wait(0.5)
+end
+
+
 -- Serviços
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
