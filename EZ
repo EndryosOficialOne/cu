@@ -3,7 +3,7 @@ local player = game.Players.LocalPlayer
 while not player.Character do
 	task.wait(0.5)
 end
-
+task.wait(1.5)
 
 -- Serviços
 local Players = game:GetService("Players")
