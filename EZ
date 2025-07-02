@@ -265,7 +265,7 @@ local function updateESP()
 					end
 				end)
 
-				local teamColor = player ~= LocalPlayer and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(0, 2550, 255)
+				local teamColor = player ~= LocalPlayer and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(0, 200, 200)
 
 local FS = player == LocalPlayer and "Size12" or "Size10"
 
@@ -760,7 +760,7 @@ local tracking = false
 local trackedPlayer = nil
 local lerping = false
 local lerpProgress = 0
-local maxHistory = 20
+local maxHistory = 30
 local historyMap = {} -- player -> posições anteriores
 
 -- Salva as posições dos jogadores em segundo plano
