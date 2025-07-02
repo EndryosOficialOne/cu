@@ -265,7 +265,7 @@ local function updateESP()
 					end
 				end)
 
-				local teamColor = player ~= LocalPlayer and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(0, 200, 200)
+				local teamColor = player ~= LocalPlayer and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(0, 225, 225)
 
 local FS = player == LocalPlayer and "Size12" or "Size10"
 
@@ -501,7 +501,7 @@ local resultado = (color.r == 0 and color.g == 0 and color.b == 0) -- true se pr
 
 if resultado then
 if not (SENSIBILIDADE == 15) then
-SENSIBILIDADE = 17
+SENSIBILIDADE = 20
 
 notify("Aimbot Aumentado!", "Vou analizar o jogador MUITO mais consciente.")
 return
