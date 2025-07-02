@@ -1,10 +1,14 @@
 local player = game.Players.LocalPlayer
+if not player.Character then
 
 while not player.Character do
 	task.wait(0.5)
 end
 
 task.wait(1.5)
+
+end
+
 
 -- Serviços
 local Players = game:GetService("Players")
@@ -261,9 +265,9 @@ local function updateESP()
 					end
 				end)
 
-				local teamColor = player ~= LocalPlayer and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(80, 80, 255)
+				local teamColor = player ~= LocalPlayer and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(0, 2550, 255)
 
-local FS = player == LocalPlayer and "Size10" or "Size10"
+local FS = player == LocalPlayer and "Size12" or "Size10"
 
 espGui.TextLabel.FontSize = FS
 				espGui.TextLabel.TextColor3 = teamColor
