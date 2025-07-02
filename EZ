@@ -3,6 +3,7 @@ local player = game.Players.LocalPlayer
 while not player.Character do
 	task.wait(0.5)
 end
+
 task.wait(1.5)
 
 -- Serviços
@@ -236,7 +237,7 @@ end
 
 local function updateESP()
 	for _, player in pairs(Players:GetPlayers()) do
-		if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
+		if player.Character and player.Character:FindFirstChild("Head") then
 			createESP(player)
 
 			local head = player.Character.Head
@@ -260,9 +261,11 @@ local function updateESP()
 					end
 				end)
 
-				local teamColor = player.Team == LocalPlayer.Team and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+				local teamColor = player ~= LocalPlayer and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(80, 80, 255)
 
-espGui.TextLabel.FontSize = "Size10"
+local FS = player == LocalPlayer and "Size10" or "Size10"
+
+espGui.TextLabel.FontSize = FS
 				espGui.TextLabel.TextColor3 = teamColor
 				espGui.TextLabel.Text = ("%s | %.0f M\n%s - %s"):format(player.Name, distance, healthText, equippedItem)
 			end
@@ -346,26 +349,26 @@ RunService.RenderStepped:Connect(function(dt)
 end)
 -- Lista de posições insanas pra teleporte
 posicoes = {
-    Vector3.new(1e6, -490, 1e6),
-	Vector3.new(-1e6, -490, 1e6),
-	Vector3.new(1e6, -490, -1e6),
-	Vector3.new(-1e6, -490, -1e6),
-	Vector3.new(5e5, -490, 0),
-	Vector3.new(-5e5, -490, 0),
-	Vector3.new(0, -490, 5e5),
-	Vector3.new(0, -490, -5e5),
-	Vector3.new(123456, -490, 654321),
-	Vector3.new(-123456, -490, -654321),
-	Vector3.new(888888, -490, 444444),
-	Vector3.new(-888888, -490, -444444),
-	Vector3.new(777777, -490, 333333),
-	Vector3.new(-777777, -490, -333333),
-	Vector3.new(111111, -490, 222222),
-	Vector3.new(-111111, -490, -222222),
-	Vector3.new(696969, -490, 969696),
-	Vector3.new(-696969, -490, -969696),
-	Vector3.new(420420, -490, 420420),
-	Vector3.new(-420420, -490, -420420),
+    Vector3.new(1e6, -499, 1e6),
+	Vector3.new(-1e6, -499, 1e6),
+	Vector3.new(1e6, -499, -1e6),
+	Vector3.new(-1e6, -499, -1e6),
+	Vector3.new(5e5, -499, 0),
+	Vector3.new(-5e5, -499, 0),
+	Vector3.new(0, -499, 5e5),
+	Vector3.new(0, -499, -5e5),
+	Vector3.new(123456, -499, 654321),
+	Vector3.new(-123456, -499, -654321),
+	Vector3.new(888888, -499, 444444),
+	Vector3.new(-888888, -499, -444444),
+	Vector3.new(777777, -499, 333333),
+	Vector3.new(-777777, -499, -333333),
+	Vector3.new(111111, -499, 222222),
+	Vector3.new(-111111, -499, -222222),
+	Vector3.new(696969, -499, 969696),
+	Vector3.new(-696969, -499, -969696),
+	Vector3.new(420420, -499, 420420),
+	Vector3.new(-420420, -499, -420420),
 }
 
 
@@ -485,6 +488,27 @@ if mobileGui then
      cloneRun.MouseButton1Down:Connect(function()
 
 
+local icon = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+    :WaitForChild("Mobile"):WaitForChild("Run"):WaitForChild("Icon")
+
+local color = icon.ImageColor3
+local resultado = (color.r == 0 and color.g == 0 and color.b == 0) -- true se preto
+
+
+if resultado then
+if not (SENSIBILIDADE == 15) then
+SENSIBILIDADE = 17
+
+notify("Aimbot Aumentado!", "Vou analizar o jogador MUITO mais consciente.")
+return
+else
+
+SENSIBILIDADE = 9
+
+notify("Aimbot Normal!", "Vou analizar o jogado normalmente!.")
+return
+end
+end
 
 local icon = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
     :WaitForChild("Mobile"):WaitForChild("Jump"):WaitForChild("Icon")
