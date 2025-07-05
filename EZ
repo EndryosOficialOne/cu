@@ -529,10 +529,12 @@ if GGHI then
 
 notify("Aimbot Inteligente Inativo.", "Pelo visto você não gostou disto :(")
 SENSIBILIDADE = 0
+return
 else
 
 notify("Aimbot Ativo!", "Vou analizar o jogador mais consciente.")
 SENSIBILIDADE = 9
+return
 end
 
 end
@@ -561,19 +563,6 @@ _G.SPEED1 = 40
 _G.SPEED2 = 1.4
 DDY = 120
 
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-
-local function duplicarPulo(char)
-	local humanoid = char:WaitForChild("Humanoid")
-	humanoid.JumpPower = 120
-end
-
--- Aplica ao personagem atual
-if player.Character then
-	duplicarPulo(player.Character)
-end
-
 
 notify("Fim!", "Abilidades normalmente...")
 
@@ -583,19 +572,6 @@ else
 _G.SPEED1 = 165
 _G.SPEED2 = 2.25
 DDY = 200
-
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-
-local function duplicarPulo(char)
-	local humanoid = char:WaitForChild("Humanoid")
-	humanoid.JumpPower = 200
-end
-
--- Aplica ao personagem atual
-if player.Character then
-	duplicarPulo(player.Character)
-end
 
 notify("IPER! ACIONADA!", "Novos poderes foram aprimorados!")
 
@@ -878,4 +854,33 @@ task.wait(0.65)
 		lerping = false
 		lerpProgress = 0
 	end
+end)
+
+task.spawn(function()
+
+while true do task.wait(0.5)
+
+
+pcall(function()
+
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local function duplicarPulo(char)
+	local humanoid = char:WaitForChild("Humanoid")
+	humanoid.JumpPower = DDY
+end
+
+-- Aplica ao personagem atual
+if player.Character then
+	duplicarPulo(player.Character)
+end
+
+
+
+
+end)
+end
+
 end)
