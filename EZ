@@ -437,7 +437,7 @@ end)
 RunService.RenderStepped:Connect(function()
     local char = player.Character or player.CharacterAdded:Wait()
     local hrp = char:FindFirstChild("HumanoidRootPart")
-    if hrp and not FCKING and hrp.Position.Y < (0 + DD2) then
+    if hrp and not FCKING and not FCKING2 and hrp.Position.Y < (0 + DD2) then
         hrp.CFrame = CFrame.new(400, 1200, 0)
         
     end
@@ -500,7 +500,7 @@ local resultado = (color.r == 0 and color.g == 0 and color.b == 0) -- true se pr
 
 
 if resultado then
-if not (SENSIBILIDADE == 15) then
+if not (SENSIBILIDADE == 20) then
 SENSIBILIDADE = 20
 
 notify("Aimbot Aumentado!", "Vou analizar o jogador MUITO mais consciente.")
@@ -883,4 +883,180 @@ end
 end)
 end
 
+end)
+
+
+
+
+
+
+-- Botão clonado que teleporta o player pra cima com chão invisível
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local mobileGui = playerGui:FindFirstChild("Mobile")
+if mobileGui then
+    local dashButton = mobileGui:FindFirstChild("Dash")
+    local runButton = mobileGui:FindFirstChild("Run")
+
+    if dashButton and runButton then
+        local cloneDash = dashButton:Clone()
+        local CD = cloneDash
+        cloneDash.Size = UDim2.new(0.15, 0, 0.15, 0)
+        cloneDash.Position = UDim2.new(0.92, 0, 0.12, 0)
+        cloneDash.Parent = mobileGui
+
+cloneDash.MouseButton1Down:Connect(function()
+            
+        local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+
+-- Salva posição original
+local originalPosition = HumanoidRootPart.Position
+
+-- Função pra pegar o player mais próximo
+local function getNearestPlayer()
+	local closestPlayer = nil
+	local shortestDistance = math.huge
+
+	for _, player in ipairs(Players:GetPlayers()) do
+		if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+			local distance = (HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
+			if distance < shortestDistance then
+				shortestDistance = distance
+				closestPlayer = player
+			end
+		end
+	end
+
+	return closestPlayer
+end
+
+-- Main
+local targetPlayer = getNearestPlayer()
+if not targetPlayer or not targetPlayer.Character or not targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+	warn("Nenhum player encontrado")
+	return
+end
+
+FCKING2 = true
+-- Posição isolada no limbo
+local limboPosition = Vector3.new(5e5, -480, 5e5)
+
+-- Cria uma plataforma no limbo
+local platform = Instance.new("Part")
+platform.Size = Vector3.new(20, 1, 20)
+platform.Position = limboPosition - Vector3.new(0, 2, 0)
+platform.Anchored = true
+platform.Name = "LimboPlatform"
+platform.Parent = workspace
+
+task.spawn(function()
+
+
+-- Script 1: Congelar a câmera no lugar atual
+
+local player = game.Players.LocalPlayer
+local camera = workspace.CurrentCamera
+
+-- Pega a posição e rotação atuais da câmera
+local camCFrame = camera.CFrame
+
+-- Define a câmera como Scriptable (modo livre)
+camera.CameraType = Enum.CameraType.Scriptable
+
+-- Fixa a câmera na posição atual
+camera.CFrame = camCFrame
+end)
+
+-- Teleporta pro limbo
+HumanoidRootPart.CFrame = CFrame.new(limboPosition)
+
+-- Repete zerando a velocidade
+local heartbeatConnection
+heartbeatConnection = RunService.Heartbeat:Connect(function()
+	if Character and HumanoidRootPart then
+		HumanoidRootPart.Velocity = Vector3.zero
+	end
+end)
+
+-- Espera 1 segundo
+task.delay(1, function()
+	-- Desconecta o repetidor
+	if heartbeatConnection then
+		heartbeatConnection:Disconnect()
+	end
+
+	-- Remove a plataforma
+	if platform and platform.Parent then
+		platform:Destroy()
+	end
+
+	-- Teleporta até o player salvo
+	local targetHRP = targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+	if targetHRP then
+		HumanoidRootPart.CFrame = targetHRP.CFrame
+
+		-- Espera 2 segundos antes de começar a voltar
+		task.delay(2, function()
+			-- Posição final do retorno (original + 40 em Y)
+			local returnPosition = originalPosition + Vector3.new(0, 40, 0)
+
+FCKING2 = false
+task.spawn(function()
+-- Script 2: Voltar a câmera pro jogador
+
+local player = game.Players.LocalPlayer
+local camera = workspace.CurrentCamera
+
+-- Volta para o modo padrão (acompanha o player de novo)
+camera.CameraType = Enum.CameraType.Custom
+
+end)
+
+
+			-- Loop de volta
+			for i = 1, 10 do
+				HumanoidRootPart.CFrame = CFrame.new(returnPosition)
+				task.wait(0.1)
+			end
+		end)
+	end
+end)
+
+        end)
+    end -- fecha if dashButton and runButton
+end -- fecha if mobileGui
+
+
+task.spawn(function()
+    while true do
+        task.wait(0.5)
+
+        local Players = game:GetService("Players")
+        local player = Players.LocalPlayer
+
+        local equippedItem2 = "???"
+        local success, err = pcall(function()
+            local slot = player:FindFirstChild("MAIN_DATA") and player.MAIN_DATA:FindFirstChild("Slot")
+            local slots = player.MAIN_DATA and player.MAIN_DATA:FindFirstChild("Slots")
+            if slot and slots then
+                local items = slots:GetChildren()
+                table.sort(items, function(a, b)
+                    return tonumber(a.Name) < tonumber(b.Name)
+                end)
+                local equipped = items[slot.Value]
+                equippedItem2 = equipped and equipped.Value or "N/A"
+            end
+        end)
+
+        if equippedItem2 == "LightV2" then
+            CD.Position = UDim2.new(0.92, 0, 0.12, 0)
+        else
+            CD.Position = UDim2.new(5, 0, 0.12, 0)
+        end
+    end
 end)
