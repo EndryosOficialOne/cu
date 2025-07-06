@@ -1,3 +1,5 @@
+--V1.0
+
 local player = game.Players.LocalPlayer
 if not player.Character then
 
@@ -848,7 +850,7 @@ end)
 -- Terminou toque
 touchArea.InputEnded:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-task.wait(0.65)
+task.wait(0.85)
 		tracking = false
 		trackedPlayer = nil
 		lerping = false
@@ -901,7 +903,7 @@ if mobileGui then
 
     if dashButton and runButton then
         local cloneDash = dashButton:Clone()
-        local CD = cloneDash
+        CD = cloneDash
         cloneDash.Size = UDim2.new(0.15, 0, 0.15, 0)
         cloneDash.Position = UDim2.new(0.92, 0, 0.12, 0)
         cloneDash.Parent = mobileGui
