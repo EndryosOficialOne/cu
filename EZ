@@ -1,4 +1,4 @@
---V1.0
+--V1.5
 
 local player = game.Players.LocalPlayer
 if not player.Character then
@@ -21,6 +21,7 @@ local TweenService = game:GetService("TweenService")
 local Workspace = game:GetService("Workspace")
 D2 = 0
 DD2 = 0
+SuperClicks = _G.SPC or false
 
 -- Player e GUI
 local player = Players.LocalPlayer
@@ -492,6 +493,28 @@ if mobileGui then
 
                   
      cloneRun.MouseButton1Down:Connect(function()
+
+
+local icon = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+    :WaitForChild("Mobile"):WaitForChild("Lock"):WaitForChild("Icon")
+
+local color = icon.ImageColor3
+local resultado = (color.r == 0 and color.g == 0 and color.b == 0) -- true se preto
+
+
+if resultado then
+local txt = ""
+ 
+ if not SuperClicks then
+ txt = "O NOVO SISTEMA DE CLICKS ABSOLUTOS ATIVADOS!"
+ else
+ txt = "Sistema Desabilitado..."
+ 
+ end
+ SuperClicks = not (SuperClicks)
+notify("Super Click!", txt)
+return
+end
 
 
 local icon = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
@@ -1061,4 +1084,132 @@ task.spawn(function()
             CD.Position = UDim2.new(5, 0, 0.12, 0)
         end
     end
+end)
+
+
+
+
+
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+
+-- Função pra pegar o personagem
+local function getChar(player)
+	return player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character
+end
+
+-- Função pra pegar o player mais próximo do centro da tela
+local function getClosestPlayerToCenter()
+	local closestPlayer = nil
+	local closestDistance = math.huge
+	local center = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+
+	for _, player in ipairs(Players:GetPlayers()) do
+		if player ~= LocalPlayer then
+			local char = getChar(player)
+			if char then
+				local pos, onScreen = Camera:WorldToViewportPoint(char.HumanoidRootPart.Position)
+				if onScreen then
+					local screenPos = Vector2.new(pos.X, pos.Y)
+					local dist = (screenPos - center).Magnitude
+					if dist < closestDistance then
+						closestDistance = dist
+						closestPlayer = player
+					end
+				end
+			end
+		end
+	end
+
+	return closestPlayer
+end
+
+-- TELEPORTE INSANO
+local function teleportToClosest()
+	local targetPlayer = getClosestPlayerToCenter()
+	if not targetPlayer then warn("Nenhum player na tela") return end
+
+DDS = true
+		
+		
+for i = 1, 70 do
+	local targetChar = getChar(targetPlayer)
+	local localChar = getChar(LocalPlayer)
+	if not targetChar or not localChar then return end
+
+	local hrp = localChar.HumanoidRootPart
+	local targetHrp = targetChar.HumanoidRootPart
+
+	local direction = (hrp.Position - targetHrp.Position).Unit
+	local newPosition = targetHrp.Position + direction * 4.5
+
+	hrp.CFrame = CFrame.new(newPosition, targetHrp.Position)
+	task.wait()
+	end
+	
+	task.wait(1)
+	DDS = false
+end
+
+
+
+
+
+
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local mobileGui = playerGui:FindFirstChild("Mobile")
+if mobileGui then
+    
+    local runButton = mobileGui:FindFirstChild("Use")
+
+    if runButton then
+    runButton.MouseButton1Down:Connect(function()
+            if SuperClicks then
+            teleportToClosest()
+            end
+            
+            
+               
+            
+            end)
+    end
+    end 
+    
+    
+    local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+RunService.RenderStepped:Connect(function()
+if not DDS then
+return
+
+end
+
+	local closestPlayer
+	local closestDist = math.huge
+
+	for _, player in pairs(Players:GetPlayers()) do
+		if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+			local dist = (player.Character.HumanoidRootPart.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+			if dist < closestDist then
+				closestDist = dist
+				closestPlayer = player
+			end
+		end
+	end
+
+	if closestPlayer and closestPlayer.Character and closestPlayer.Character:FindFirstChild("HumanoidRootPart") then
+		local myPos = Camera.CFrame.Position
+		local targetPos = closestPlayer.Character.HumanoidRootPart.Position
+		targetPos = Vector3.new(targetPos.X, myPos.Y, targetPos.Z) -- mesmo Y da câmera atual
+
+		Camera.CFrame = CFrame.new(myPos, targetPos)
+	end
 end)
