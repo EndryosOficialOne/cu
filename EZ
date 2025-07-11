@@ -1,5 +1,3 @@
---V1.5
-
 local player = game.Players.LocalPlayer
 if not player.Character then
 
@@ -1135,7 +1133,7 @@ local function teleportToClosest()
 DDS = true
 		
 		
-for i = 1, 70 do
+for i = 1, 60 do
 	local targetChar = getChar(targetPlayer)
 	local localChar = getChar(LocalPlayer)
 	if not targetChar or not localChar then return end
@@ -1170,7 +1168,29 @@ if mobileGui then
     if runButton then
     runButton.MouseButton1Down:Connect(function()
             if SuperClicks then
+            local Players = game:GetService("Players")
+        local player = Players.LocalPlayer
+
+        local equippedItem2 = "???"
+        local success, err = pcall(function()
+            local slot = player:FindFirstChild("MAIN_DATA") and player.MAIN_DATA:FindFirstChild("Slot")
+            local slots = player.MAIN_DATA and player.MAIN_DATA:FindFirstChild("Slots")
+            if slot and slots then
+                local items = slots:GetChildren()
+                table.sort(items, function(a, b)
+                    return tonumber(a.Name) < tonumber(b.Name)
+                end)
+                local equipped = items[slot.Value]
+                equippedItem2 = equipped and equipped.Value or "N/A"
+            end
+        end)
+
+        if equippedItem2 == "LightV2" or equippedItem2 == "DoughV2" or equippedItem2 == "IceV2" then
+        
             teleportToClosest()
+            else
+            notify("Fruta não listada")
+            end
             end
             
             
