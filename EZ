@@ -1,4 +1,4 @@
---V2.0
+--V2.1
 
 local player = game.Players.LocalPlayer
 if not player.Character then
@@ -1187,7 +1187,7 @@ if mobileGui then
             end
         end)
 
-        if equippedItem2 == "LightV2" or equippedItem2 == "DoughV2" or equippedItem2 == "IceV2" or equippedItem2 == "Love" or equippedItem2 == "Soul" or equippedItem2 = "Paw" or equippedItem2 == "FrameV2" or equippedItem2 == "Leopard" or equippedItem2 == "Lightning" then
+        if equippedItem2 == "LightV2" or equippedItem2 == "DoughV2" or equippedItem2 == "IceV2" or equippedItem2 == "Love" or equippedItem2 == "Soul" or equippedItem2 == "Paw" or equippedItem2 == "FrameV2" or equippedItem2 == "Leopard" or equippedItem2 == "Lightning" then
         
             teleportToClosest()
             else
@@ -1235,4 +1235,4 @@ end
 
 		Camera.CFrame = CFrame.new(myPos, targetPos)
 	end
-end)
+end) 
