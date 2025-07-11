@@ -1,4 +1,4 @@
---V2.1
+--V2.5
 
 local player = game.Players.LocalPlayer
 if not player.Character then
@@ -1044,9 +1044,9 @@ end)
 
 
 			-- Loop de volta
-			for i = 1, 10 do
+			for i = 1, 30 do
 				HumanoidRootPart.CFrame = CFrame.new(returnPosition)
-				task.wait(0.1)
+				task.wait()
 			end
 		end)
 	end
@@ -1102,7 +1102,7 @@ local function getChar(player)
 end
 
 -- Função pra pegar o player mais próximo do centro da tela
-local function getClosestPlayerToCenter()
+function getClosestPlayerToCenter()
 	local closestPlayer = nil
 	local closestDistance = math.huge
 	local center = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
@@ -1187,6 +1187,8 @@ if mobileGui then
             end
         end)
 
+
+
         if equippedItem2 == "LightV2" or equippedItem2 == "DoughV2" or equippedItem2 == "IceV2" or equippedItem2 == "Love" or equippedItem2 == "Soul" or equippedItem2 == "Paw" or equippedItem2 == "FrameV2" or equippedItem2 == "Leopard" or equippedItem2 == "Lightning" then
         
             teleportToClosest()
@@ -1236,3 +1238,105 @@ end
 		Camera.CFrame = CFrame.new(myPos, targetPos)
 	end
 end) 
+
+
+hotbarSlotsVerificar = {}
+task.spawn(function()
+
+
+while true do task.wait(0.5)
+local Players = game:GetService("Players")
+        local player = Players.LocalPlayer
+
+        local equippedItem2 = "???"
+        local success, err = pcall(function()
+            local slot = player:FindFirstChild("MAIN_DATA") and player.MAIN_DATA:FindFirstChild("Slot")
+            local slots = player.MAIN_DATA and player.MAIN_DATA:FindFirstChild("Slots")
+            if slot and slots then
+                local items = slots:GetChildren()
+                table.sort(items, function(a, b)
+                    return tonumber(a.Name) < tonumber(b.Name)
+                end)
+                local equipped = items[slot.Value]
+                equippedItem2 = equipped and equipped.Value or "N/A"
+            end
+        end)
+
+if equippedItem2 == "Lightning" then
+
+hotbarSlotsVerificar = {2, 5}
+elseif equippedItem2 == "DoughV2" then
+hotbarSlotsVerificar = {2}
+elseif equippedItem2 == "LeopardV2" then
+hotbarSlotsVerificar = {3}
+elseif equippedItem2 == "Love" then
+hotbarSlotsVerificar = {2}
+elseif equippedItem2 == "IceV2" then
+hotbarSlotsVerificar = {3}
+end
+
+
+
+end
+end)
+
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local StarterGui = game:GetService("StarterGui")
+
+local estaComCor = false
+local corAlvo = Color3.fromRGB(42, 44, 40)
+
+-- AQUI TÁ A LISTA QUE VOCÊ PODE MUDAR!
+
+RunService.RenderStepped:Connect(function()
+	pcall(function()
+		local hotbar = Players.LocalPlayer.PlayerGui.UI.Hotbar
+		local algumSlotSemCor = false
+
+		for _, slotIndex in ipairs(hotbarSlotsVerificar) do
+			local slot = hotbar:FindFirstChild(tostring(slotIndex))
+			
+			
+			if slot then
+				if slot.BackgroundColor3 ~= corAlvo then
+				
+				
+        
+					algumSlotSemCor = true
+					break
+				end
+			end
+		end
+		
+		
+		if algumSlotSemCor then
+		
+		
+			if not estaComCor then
+				AS = (SENSIBILIDADE + 0)
+				SENSIBILIDADE = 4
+
+				trackedPlayer = getClosestPlayer()
+				if trackedPlayer then
+					tracking = true
+					lerping = true
+					lerpProgress = 0
+				end
+
+				estaComCor = true
+			end
+		else
+			if estaComCor then
+				task.wait(1)
+				SENSIBILIDADE = AS
+				tracking = false
+				trackedPlayer = nil
+				lerping = false
+				lerpProgress = 0
+
+				estaComCor = false
+			end
+		end
+	end)
+end)
