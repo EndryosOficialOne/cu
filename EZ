@@ -1,3 +1,5 @@
+--V2.0
+
 local player = game.Players.LocalPlayer
 if not player.Character then
 
@@ -1185,11 +1187,12 @@ if mobileGui then
             end
         end)
 
-        if equippedItem2 == "LightV2" or equippedItem2 == "DoughV2" or equippedItem2 == "IceV2" then
+        if equippedItem2 == "LightV2" or equippedItem2 == "DoughV2" or equippedItem2 == "IceV2" or equippedItem2 == "Love" or equippedItem2 == "Soul" or equippedItem2 = "Paw" or equippedItem2 == "FrameV2" or equippedItem2 == "Leopard" or equippedItem2 == "Lightning" then
         
             teleportToClosest()
             else
-            notify("Fruta não listada")
+            notify("Fruta não listada", "Ingelfelizmente essa opção não está disponível para sua fruta. ( fumcaonção desativada )")
+            SuperClicks = false
             end
             end
             
