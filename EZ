@@ -1,4 +1,4 @@
---V3.0
+--V3.1
 
 local player = game.Players.LocalPlayer
 if not player.Character then
@@ -1193,7 +1193,7 @@ if mobileGui then
         
             teleportToClosest()
             else
-            notify("Fruta não listada", "Ingelfelizmente essa opção não está disponível para sua fruta. ( fumcaonção desativada )")
+            notify("Fruta não listada!!", "Ingelfelizmente essa opção não está disponível para sua fruta. ( fumcaonção desativada )")
             SuperClicks = false
             end
             end
