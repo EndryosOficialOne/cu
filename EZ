@@ -1,4 +1,4 @@
---V2.5
+--V3.0
 
 local player = game.Players.LocalPlayer
 if not player.Character then
@@ -1144,7 +1144,7 @@ for i = 1, 60 do
 	local targetHrp = targetChar.HumanoidRootPart
 
 	local direction = (hrp.Position - targetHrp.Position).Unit
-	local newPosition = targetHrp.Position + direction * 4.5
+	local newPosition = targetHrp.Position + direction * 4
 
 	hrp.CFrame = CFrame.new(newPosition, targetHrp.Position)
 	task.wait()
@@ -1189,7 +1189,7 @@ if mobileGui then
 
 
 
-        if equippedItem2 == "LightV2" or equippedItem2 == "DoughV2" or equippedItem2 == "IceV2" or equippedItem2 == "Love" or equippedItem2 == "Soul" or equippedItem2 == "Paw" or equippedItem2 == "FrameV2" or equippedItem2 == "Leopard" or equippedItem2 == "Lightning" then
+        if equippedItem2 == "LightV2" or equippedItem2 == "DoughV2" or equippedItem2 == "IceV2" or equippedItem2 == "Love" or equippedItem2 == "Soul" or equippedItem2 == "Paw" or equippedItem2 == "FrameV2" or equippedItem2 == "Leopard" or equippedItem2 == "Lightning" or equippedItem2 == "String" then
         
             teleportToClosest()
             else
@@ -1273,6 +1273,14 @@ elseif equippedItem2 == "Love" then
 hotbarSlotsVerificar = {2}
 elseif equippedItem2 == "IceV2" then
 hotbarSlotsVerificar = {3}
+else
+hotbarSlotsVerificar = {}
+end
+
+if not _G.AimV2 then
+
+hotbarSlotsVerificar = {}
+
 end
 
 
