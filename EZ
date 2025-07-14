@@ -1,5 +1,4 @@
---V3.5
-
+--V3.1 CFM
 
 local player = game.Players.LocalPlayer
 if not player.Character then
@@ -944,7 +943,7 @@ local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
 local originalPosition = HumanoidRootPart.Position
 
 -- Função pra pegar o player mais próximo
-local function getNearestPlayer()
+getNearestPlayer = function()
 	local closestPlayer = nil
 	local shortestDistance = math.huge
 
@@ -960,6 +959,8 @@ local function getNearestPlayer()
 
 	return closestPlayer
 end
+
+GNP = getNearestPlayer
 
 -- Main
 local targetPlayer = getNearestPlayer()
@@ -1131,11 +1132,11 @@ end
 -- TELEPORTE INSANO
 local function teleportToClosest()
 if _G.Iper then
-	local targetPlayer = getClosestPlayerToCenter()
+ targetPlayer = getClosestPlayerToCenter()
 	
 	else
 	
-	local targetPlayer = getClosestPlayer()
+	targetPlayer = GNP()
 	
 	
 	end
