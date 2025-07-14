@@ -1,4 +1,4 @@
---V3.2
+--V3.5
 
 local player = game.Players.LocalPlayer
 if not player.Character then
@@ -1161,7 +1161,7 @@ end
 DDS = true
 		
 		
-for i = 1, 80 do
+for i = 1, 70 do
 pcall(function()
 	local targetChar = getChar(targetPlayer)
 	local localChar = getChar(LocalPlayer)
@@ -1171,7 +1171,7 @@ pcall(function()
 	local targetHrp = targetChar.HumanoidRootPart
 
 	local direction = (hrp.Position - targetHrp.Position).Unit
-	local newPosition = targetHrp.Position + direction * 4
+	local newPosition = targetHrp.Position + direction * 4.2
 
 	hrp.CFrame = CFrame.new(newPosition, targetHrp.Position)
 	task.wait()
