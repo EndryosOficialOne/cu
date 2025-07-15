@@ -404,6 +404,13 @@ posicoes = {
 	Vector3.new(-420420, -4900, -420420),
 }
 
+elseif game.PlaceId == 3457700596 then
+
+posicoes = {
+    Vector3.new(1e6, 0, 1e6),
+	Vector3.new(-1e6, 0, 1e6),
+}
+
 end
 
 -- Teleporte louco com base de proteção
