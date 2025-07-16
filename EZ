@@ -406,9 +406,16 @@ posicoes = {
 
 elseif game.PlaceId == 3457700596 then
 
+StarterGui:SetCore("SendNotification", {
+    Title = "!! AVISO !!",
+    Text = "Partidas Classificadas Indentificado!!,
+    Duration = 5
+})
+
+
 posicoes = {
-    Vector3.new(9999, 9999, 9999),
-	Vector3.new(9999, 9999, 9999),
+    Vector3.new(-800, 110, -580),
+	Vector3.new(-800, 110, -600),
 }
 
 end
