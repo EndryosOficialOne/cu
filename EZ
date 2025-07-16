@@ -1,4 +1,4 @@
---V4.0
+--V4.1
 
 local player = game.Players.LocalPlayer
 if not player.Character then
@@ -414,8 +414,8 @@ StarterGui:SetCore("SendNotification", {
 
 
 posicoes = {
-    Vector3.new(-8000, 110, -580),
-	Vector3.new(-8000, 110, -600),
+    Vector3.new(-5e5, 110, -5e5),
+	Vector3.new(5e5, 110, 5e5),
 }
 
 end
