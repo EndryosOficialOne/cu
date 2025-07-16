@@ -1,4 +1,4 @@
---V3.5
+--V4.0
 
 local player = game.Players.LocalPlayer
 if not player.Character then
@@ -404,7 +404,7 @@ posicoes = {
 	Vector3.new(-420420, -4900, -420420),
 }
 
-elseif game.PlaceId == 3457700596 then
+elseif game.PlaceId == 17493357698 then
 
 StarterGui:SetCore("SendNotification", {
     Title = "!! AVISO !!",
@@ -414,8 +414,8 @@ StarterGui:SetCore("SendNotification", {
 
 
 posicoes = {
-    Vector3.new(-800, 110, -580),
-	Vector3.new(-800, 110, -600),
+    Vector3.new(-8000, 110, -580),
+	Vector3.new(-8000, 110, -600),
 }
 
 end
