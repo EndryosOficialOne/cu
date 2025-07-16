@@ -408,7 +408,7 @@ elseif game.PlaceId == 3457700596 then
 
 StarterGui:SetCore("SendNotification", {
     Title = "!! AVISO !!",
-    Text = "Partidas Classificadas Indentificado!!,
+    Text = "Partidas Classificadas Indentificado!!",
     Duration = 5
 })
 
