@@ -1231,7 +1231,24 @@ if mobileGui then
 
 
 
-        if equippedItem2 == "LightV2" or equippedItem2 == "DoughV2" or equippedItem2 == "IceV2" or equippedItem2 == "Love" or equippedItem2 == "Soul" or equippedItem2 == "Paw" or equippedItem2 == "FrameV2" or equippedItem2 == "Leopard" or equippedItem2 == "Lightning" or equippedItem2 == "String" or equippedItem2 == "FlameV2" then
+        local allowedItems = {
+	LightV2 = true,
+	DoughV2 = true,
+	IceV2 = true,
+	Love = true,
+	Soul = true,
+	Paw = true,
+	FrameV2 = true,
+	Leopard = true,
+	Lightning = true,
+	String = true,
+	FlameV2 = true,
+	Falcon = true
+}
+
+if allowedItems[equippedItem2] then
+
+
         
             teleportToClosest()
             else
