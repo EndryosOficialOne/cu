@@ -1,4 +1,4 @@
---V4.2
+--V4.4
 
 local player = game.Players.LocalPlayer
 if not player.Character then
@@ -539,18 +539,19 @@ local resultado = (color.r == 0 and color.g == 0 and color.b == 0) -- true se pr
 
 
 if resultado then
-if not (SENSIBILIDADE == 20) then
-SENSIBILIDADE = 20
-
-notify("Aimbot Aumentado!", "Vou analizar o jogador MUITO mais consciente.")
-return
+if DDY == 80 then
+_G.SPEED1 = 40
+_G.SPEED2 = 1.4
+DDY = 120
+notify("Velocidade Modificada", "Velocidade , top do top...")
 else
+_G.SPEED1 = 30
+_G.SPEED2 = 0.8
+DDY = 80
+notify("Velocidade Normal", "Velocidade mais oroxima do jogo em si...")
 
-SENSIBILIDADE = 9
-
-notify("Aimbot Normal!", "Vou analizar o jogado normalmente!.")
-return
 end
+
 end
 
 local icon = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
