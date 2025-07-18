@@ -316,7 +316,7 @@ touchArea.InputBegan:Connect(function(input)
         if not PS then
             local char = player.Character or player.CharacterAdded:Wait()
             local hrp = char:WaitForChild("HumanoidRootPart")
-            PS = hrp.CFrame + Vector3.new(0, 20, 0)
+            PS = hrp.CFrame + Vector3.new(0, 0, 0)
             
         end
         FCKING = true
