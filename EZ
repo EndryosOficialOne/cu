@@ -1,4 +1,4 @@
---V4.4
+--V4.5
 
 local player = game.Players.LocalPlayer
 if not player.Character then
@@ -544,12 +544,13 @@ _G.SPEED1 = 40
 _G.SPEED2 = 1.4
 DDY = 120
 notify("Velocidade Modificada", "Velocidade , top do top...")
+return
 else
-_G.SPEED1 = 30
-_G.SPEED2 = 0.8
+_G.SPEED1 = 25
+_G.SPEED2 = 0.7
 DDY = 80
 notify("Velocidade Normal", "Velocidade mais oroxima do jogo em si...")
-
+return
 end
 
 end
