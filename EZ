@@ -1,4 +1,4 @@
---V4.5
+--V4.6
 
 local player = game.Players.LocalPlayer
 if not player.Character then
@@ -316,7 +316,7 @@ touchArea.InputBegan:Connect(function(input)
         if not PS then
             local char = player.Character or player.CharacterAdded:Wait()
             local hrp = char:WaitForChild("HumanoidRootPart")
-            PS = hrp.CFrame + Vector3.new(0, 0, 0)
+            PS = hrp.CFrame + Vector3.new(0, 5, 0)
             
         end
         FCKING = true
@@ -546,8 +546,8 @@ DDY = 120
 notify("Velocidade Modificada", "Velocidade , top do top...")
 return
 else
-_G.SPEED1 = 25
-_G.SPEED2 = 0.7
+_G.SPEED1 = 28
+_G.SPEED2 = 0.725
 DDY = 80
 notify("Velocidade Normal", "Velocidade mais oroxima do jogo em si...")
 return
