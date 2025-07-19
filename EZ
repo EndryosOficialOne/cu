@@ -1,4 +1,4 @@
---V4.6
+--V4.8
 
 local player = game.Players.LocalPlayer
 if not player.Character then
@@ -1245,7 +1245,8 @@ if mobileGui then
 	Lightning = true,
 	String = true,
 	FlameV2 = true,
-	Falcon = true
+	Falcon = true,
+ LeopardV2 = true,
 }
 
 if allowedItems[equippedItem2] then
