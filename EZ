@@ -1,4 +1,4 @@
---V4.8
+--V5.0
 
 local player = game.Players.LocalPlayer
 if not player.Character then
@@ -1187,7 +1187,7 @@ pcall(function()
 	local targetHrp = targetChar.HumanoidRootPart
 
 	local direction = (hrp.Position - targetHrp.Position).Unit
-	local newPosition = targetHrp.Position + direction * 4.2
+	local newPosition = targetHrp.Position + direction * 4.55
 
 	hrp.CFrame = CFrame.new(newPosition, targetHrp.Position)
 	task.wait()
