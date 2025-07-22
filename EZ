@@ -1,4 +1,4 @@
---V5.0
+--V6.0
 
 local player = game.Players.LocalPlayer
 if not player.Character then
@@ -1247,6 +1247,7 @@ if mobileGui then
 	FlameV2 = true,
 	Falcon = true,
  LeopardV2 = true,
+ Magnetic = true,
 }
 
 if allowedItems[equippedItem2] then
@@ -1335,6 +1336,8 @@ elseif equippedItem2 == "Love" then
 hotbarSlotsVerificar = {2}
 elseif equippedItem2 == "IceV2" then
 hotbarSlotsVerificar = {3}
+elseif equippesItem2 == "Magnetic" then
+hotbarSlotsVerificar = {4}
 else
 hotbarSlotsVerificar = {}
 end
@@ -1409,4 +1412,87 @@ RunService.RenderStepped:Connect(function()
 			end
 		end
 	end)
+end)
+
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local localPlayer = Players.LocalPlayer
+local walls = {}        -- [player] = wall
+local DIST_LIMIT = 350  -- distância máxima permitida
+
+-- Cria parede
+local function createWall(player)
+	local wall = Instance.new("Part")
+	wall.Size = Vector3.new(45, 45, 1)
+	wall.Anchored = true
+	wall.CanCollide = true
+	wall.Transparency = 0.85
+	wall.BrickColor = BrickColor.new("Really red")
+	wall.Material = Enum.Material.Metal
+	wall.Name = "ParedeStalker_" .. player.Name
+	wall.Parent = workspace
+	walls[player] = wall
+end
+
+-- Remove parede
+local function removeWall(player)
+	if walls[player] then
+		walls[player]:Destroy()
+		walls[player] = nil
+	end
+end
+
+-- Loop principal
+RunService.Heartbeat:Connect(function()
+	local myChar = localPlayer.Character
+	local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+	if not myHRP then return end
+
+	for _, player in ipairs(Players:GetPlayers()) do
+		if player ~= localPlayer then
+			local char = player.Character
+			local hrp = char and char:FindFirstChild("HumanoidRootPart")
+			local humanoid = char and char:FindFirstChildOfClass("Humanoid")
+			local alive = humanoid and humanoid.Health > 0
+			local isValid = char and hrp and alive and Players:GetPlayerFromCharacter(char)
+
+			if isValid then
+				local dist = (myHRP.Position - hrp.Position).Magnitude
+				if dist <= DIST_LIMIT then
+					-- Dentro da distância, cria se não tiver
+					if not walls[player] then
+						createWall(player)
+					end
+
+					-- Atualiza parede
+					local wall = walls[player]
+					if wall and wall.Parent then
+						local toLocal = (myHRP.Position - hrp.Position).Unit
+						local wallPos = hrp.Position - toLocal * 15
+						wall.CFrame = CFrame.new(wallPos, myHRP.Position)
+					end
+				else
+					-- Tá longe demais, remove
+					removeWall(player)
+				end
+			else
+				-- Invalido: morto, sem personagem, etc
+				removeWall(player)
+			end
+		end
+	end
+
+	-- Limpeza de players que sumiram do universo
+	for player in pairs(walls) do
+		if not Players:FindFirstChild(player.Name) then
+			removeWall(player)
+		end
+	end
+end)
+
+-- Quando sair do jogo
+Players.PlayerRemoving:Connect(function(player)
+	removeWall(player)
 end)
