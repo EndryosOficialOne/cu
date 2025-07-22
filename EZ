@@ -1,4 +1,4 @@
---V6.2 ???
+--V6.2 BETA
 
 local player = game.Players.LocalPlayer
 if not player.Character then
@@ -1336,7 +1336,7 @@ elseif equippedItem2 == "Love" then
 hotbarSlotsVerificar = {2}
 elseif equippedItem2 == "IceV2" then
 hotbarSlotsVerificar = {3}
-elseif equippesItem2 == "Magnet" then
+elseif equippedItem2 == "Magnet" then
 hotbarSlotsVerificar = {4}
 else
 hotbarSlotsVerificar = {}
@@ -1420,7 +1420,7 @@ local RunService = game:GetService("RunService")
 
 local localPlayer = Players.LocalPlayer
 local walls = {}        -- [player] = wall
-local DIST_LIMIT = 350  -- distância máxima permitida
+local DIST_LIMIT = 400  -- distância máxima permitida
 
 -- Cria parede
 local function createWall(player)
@@ -1428,7 +1428,7 @@ local function createWall(player)
 	wall.Size = Vector3.new(45, 45, 1)
 	wall.Anchored = true
 	wall.CanCollide = true
-	wall.Transparency = 0.75
+	wall.Transparency = 0.65
 	wall.BrickColor = BrickColor.new("Really black")
 		wall.Material = Enum.Material.ForceField
 	wall.Name = "ParedeStalker_" .. player.Name
