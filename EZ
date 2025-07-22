@@ -1,4 +1,4 @@
---V6.0
+--V6.2
 
 local player = game.Players.LocalPlayer
 if not player.Character then
@@ -1247,7 +1247,7 @@ if mobileGui then
 	FlameV2 = true,
 	Falcon = true,
  LeopardV2 = true,
- Magnetic = true,
+ Magnet= true,
 }
 
 if allowedItems[equippedItem2] then
@@ -1336,7 +1336,7 @@ elseif equippedItem2 == "Love" then
 hotbarSlotsVerificar = {2}
 elseif equippedItem2 == "IceV2" then
 hotbarSlotsVerificar = {3}
-elseif equippesItem2 == "Magnetic" then
+elseif equippesItem2 == "Magnet" then
 hotbarSlotsVerificar = {4}
 else
 hotbarSlotsVerificar = {}
@@ -1428,9 +1428,9 @@ local function createWall(player)
 	wall.Size = Vector3.new(45, 45, 1)
 	wall.Anchored = true
 	wall.CanCollide = true
-	wall.Transparency = 0.85
-	wall.BrickColor = BrickColor.new("Really red")
-	wall.Material = Enum.Material.Metal
+	wall.Transparency = 0.90
+	wall.BrickColor = BrickColor.new("Really black")
+		wall.Material = Enum.Material.ForceField
 	wall.Name = "ParedeStalker_" .. player.Name
 	wall.Parent = workspace
 	walls[player] = wall
