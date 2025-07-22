@@ -1425,11 +1425,11 @@ local DIST_LIMIT = 400  -- distância máxima permitida
 -- Cria parede
 local function createWall(player)
 	local wall = Instance.new("Part")
-	wall.Size = Vector3.new(45, 45, 1)
+	wall.Size = Vector3.new(55, 55, 1)
 	wall.Anchored = true
 	wall.CanCollide = true
-	wall.Transparency = 0.65
-	wall.BrickColor = BrickColor.new("Really black")
+	wall.Transparency = 0.80
+	wall.BrickColor = BrickColor.new("Really red")
 		wall.Material = Enum.Material.ForceField
 	wall.Name = "ParedeStalker_" .. player.Name
 	wall.Parent = workspace
