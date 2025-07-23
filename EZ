@@ -1248,6 +1248,7 @@ if mobileGui then
 	Falcon = true,
  LeopardV2 = true,
  Magnet= true,
+ TSRubber = true,
 }
 
 if allowedItems[equippedItem2] then
