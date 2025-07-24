@@ -1249,6 +1249,7 @@ if mobileGui then
  LeopardV2 = true,
  Magnet= true,
  TSRubber = true,
+ DarkXQuack = true,
 }
 
 if allowedItems[equippedItem2] then
