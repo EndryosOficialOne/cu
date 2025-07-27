@@ -1,4 +1,4 @@
---V6.4
+--V6.5
 
 local player = game.Players.LocalPlayer
 if not player.Character then
@@ -1251,6 +1251,7 @@ if mobileGui then
  TSRubber = true,
  DarkXQuake = true,
  Darkness = true,
+ Snow = true,
 }
 
 if allowedItems[equippedItem2] then
