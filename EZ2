@@ -1,0 +1,1557 @@
+--V7.0
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local function notify(msg)
+    local hint = Instance.new("Hint", player:WaitForChild("PlayerGui"))
+    hint.Text = msg
+    task.delay(3, function() hint:Destroy() end)
+end
+
+local success, result = pcall(function()
+    
+
+local player = game.Players.LocalPlayer
+if not player.Character then
+
+while not player.Character do
+	task.wait(0.5)
+end
+
+task.wait(1.5)
+
+end
+
+
+-- Serviços
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local StarterGui = game:GetService("StarterGui")
+local PhysicsService = game:GetService("PhysicsService")
+local TweenService = game:GetService("TweenService")
+local Workspace = game:GetService("Workspace")
+D2 = 0
+DD2 = 0
+SuperClicks = _G.SPC or false
+
+-- Player e GUI
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+local character = player.Character or player.CharacterAdded:Wait()
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+-- Variáveis de controle
+local FCKING = false
+local PS = nil
+_G.Iper = true
+GGHI = false
+
+_G.SPEED1 = 40
+_G.SPEED2 = 1.455
+
+
+if game.PlaceId == 16190471004 then
+
+DD2 = -4100
+end
+
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+char = player.Character
+	local humanoid = char:WaitForChild("Humanoid")
+DDY = 120
+
+-- Criar área invisível de toque
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = playerGui
+screenGui.ResetOnSpawn = false
+
+local touchArea = Instance.new("Frame")
+touchArea.Size = UDim2.new(0.3, 0, 0.3, 0)
+touchArea.Position = UDim2.new(-0.12, 0, 0.05, 0)
+touchArea.BackgroundTransparency = 0.8
+touchArea.Active = true
+touchArea.Parent = screenGui
+
+
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local function onCharacterAdded(char)
+    local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local StarterGui = game:GetService("StarterGui")
+
+local player = Players.LocalPlayer
+local camera = workspace.CurrentCamera
+local gui = player:WaitForChild("PlayerGui")
+local frame = gui:WaitForChild("TouchGui"):WaitForChild("TouchControlFrame")
+local dyn = frame:WaitForChild("DynamicThumbstickFrame")
+local thumbStart = dyn:WaitForChild("ThumbstickStart")
+local thumbEnd = dyn:WaitForChild("ThumbstickEnd")
+
+local char = player.Character or player.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
+local humanoid = char:WaitForChild("Humanoid")
+
+-- CONFIG
+MAX_SPEED = _G.SPEED1
+STEP_SIZE = _G.SPEED2
+local ACCELERATION = 1.5
+local DECELERATION = 2.5 -- Desaceleração mais rápida que a aceleração
+local TURN_SMOOTHNESS = 12 -- Suavização da rotação
+local MOVEMENT_SMOOTHNESS = 15 -- Suavização do movimento
+local MIN_MOVEMENT_THRESHOLD = 0.1 -- Threshold para considerar movimento
+
+-- VARS
+local currentVelocity = Vector3.zero
+local targetVelocity = Vector3.zero
+local stepMultiplier = 0
+local lastText = ""
+local lastDirection = Vector3.zero
+
+-- DIREÇÃO VISUAL (mantido igual)
+local function getDirectionArrow(vec)
+    if vec.Magnitude < 0.1 then
+        return "⏹️ Parado"
+    end
+
+    local angle = math.atan2(vec.Z, vec.X)  
+    local deg = math.atan2(vec.Z, vec.X)  
+    local deg = math.deg(angle)  
+
+    if deg >= -22.5 and deg < 22.5 then return "→" end  
+    if deg >= 22.5 and deg < 67.5 then return "↗️" end  
+    if deg >= 67.5 and deg < 112.5 then return "↑" end  
+    if deg >= 112.5 and deg < 157.5 then return "↖️" end  
+    if deg >= 157.5 or deg < -157.5 then return "←" end  
+    if deg >= -157.5 and deg < -112.5 then return "↙️" end  
+    if deg >= -112.5 and deg < -67.5 then return "↓" end  
+    if deg >= -67.5 and deg < -22.5 then return "↘️" end
+end
+
+-- MOVE DIRECTION REAL (mantido igual)
+local function getManualMoveDirection()
+    if thumbEnd.ImageTransparency == 1 then
+        return Vector3.zero
+    end
+
+    local dx = thumbEnd.Position.X.Offset - thumbStart.Position.X.Offset  
+    local dy = thumbEnd.Position.Y.Offset - thumbStart.Position.Y.Offset  
+
+    if dx ~= dx then dx = 0 end  
+    if dy ~= dy then dy = 0 end  
+
+    local moveVec = Vector3.new(dx, 0, -dy)  
+    local camCF = camera.CFrame  
+    local dir = camCF.RightVector * moveVec.X + camCF.LookVector * moveVec.Z  
+    dir = Vector3.new(dir.X, 0, dir.Z)  
+
+    if dir.Magnitude == 0 or dir.Magnitude ~= dir.Magnitude then  
+        return Vector3.zero  
+    end  
+
+    return dir.Unit
+end
+
+-- LOOP PRINCIPAL
+RunService.Heartbeat:Connect(function(dt)
+
+MAX_SPEED = _G.SPEED1
+STEP_SIZE = _G.SPEED2
+
+    -- Obter direção do input
+    local inputDirection = getManualMoveDirection()
+    local isMoving = inputDirection.Magnitude > MIN_MOVEMENT_THRESHOLD
+    
+    -- Atualizar seta de direção
+    local arrow = getDirectionArrow(inputDirection)  
+    if arrow ~= lastText then  
+        lastText = arrow  
+    end
+    
+    -- Calcular velocidade alvo
+    if isMoving then
+        targetVelocity = inputDirection * MAX_SPEED
+        lastDirection = inputDirection -- Guardar última direção para inércia
+    else
+        targetVelocity = Vector3.zero
+    end
+    
+    -- Aplicar aceleração/desaceleração suave
+    local acceleration = isMoving and ACCELERATION or DECELERATION
+    currentVelocity = currentVelocity:Lerp(
+        targetVelocity, 
+        math.clamp(dt * acceleration * MOVEMENT_SMOOTHNESS, 0, 1)
+    )
+    
+    -- Aplicar velocidade ao personagem
+    hrp.Velocity = Vector3.new(currentVelocity.X, hrp.Velocity.Y, currentVelocity.Z)
+    
+    -- Rotação suave na direção do movimento
+    if isMoving and false then
+        local targetCFrame = CFrame.lookAt(hrp.Position, hrp.Position + inputDirection)
+        hrp.CFrame = hrp.CFrame:Lerp(targetCFrame, math.clamp(dt * TURN_SMOOTHNESS, 0, 1))
+    end
+    
+    -- Efeito de passo (bounce)
+    if isMoving then
+        stepMultiplier = math.clamp(stepMultiplier + dt * ACCELERATION * 1.4, 0, 1)
+    else
+        stepMultiplier = math.clamp(stepMultiplier - dt * DECELERATION * 1.6, 0, 1)
+    end
+    
+    -- Aplicar pequeno movimento vertical para simular passos
+    local offset = inputDirection * STEP_SIZE * stepMultiplier
+    hrp.CFrame = hrp.CFrame + offset
+end)
+end
+
+if player.Character then
+    onCharacterAdded(player.Character) -- executa se já tiver personagem
+end
+
+player.CharacterAdded:Connect(onCharacterAdded) -- executa sempre que renascer
+
+
+ 
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
+local function isnil(val)
+	return val == nil
+end
+
+local function round(n)
+	return math.floor(tonumber(n) + 0.5)
+end
+
+local function createESP(player)
+	local head = player.Character and player.Character:FindFirstChild("Head")
+	if not head then return end
+
+	local existingESP = head:FindFirstChild("NameEsp")
+	if not existingESP then
+		local bill = Instance.new("BillboardGui", head)
+		bill.Name = "NameEsp"
+		bill.ExtentsOffset = Vector3.new(0, 2, 0)
+		bill.Size = UDim2.new(1, 200, 1, 30)
+		bill.Adornee = head
+		bill.AlwaysOnTop = true
+
+		local nameLabel = Instance.new("TextLabel", bill)
+		nameLabel.Name = "TextLabel"
+		nameLabel.Font = Enum.Font.GothamBold
+		nameLabel.TextWrapped = true
+		nameLabel.Size = UDim2.new(1, 0, 1, 0)
+		nameLabel.TextYAlignment = Enum.TextYAlignment.Top
+		nameLabel.BackgroundTransparency = 1
+		nameLabel.TextStrokeTransparency = 0.5
+	end
+end
+
+local function updateESP()
+	for _, player in pairs(Players:GetPlayers()) do
+		if player.Character and player.Character:FindFirstChild("Head") then
+			createESP(player)
+
+			local head = player.Character.Head
+			local espGui = head:FindFirstChild("NameEsp")
+			if espGui and espGui:FindFirstChild("TextLabel") then
+				local distance = (LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Head")) and (LocalPlayer.Character.Head.Position - head.Position).Magnitude / 3 or 0
+				local health = player.Character:FindFirstChild("Humanoid")
+				local healthText = health and ("(" .. math.floor(health.Health) .. " / " .. math.floor(health.MaxHealth) .. ")") or ""
+
+				local equippedItem = "???"
+				local success, err = pcall(function()
+					local slot = player:FindFirstChild("MAIN_DATA") and player.MAIN_DATA:FindFirstChild("Slot")
+					local slots = player.MAIN_DATA and player.MAIN_DATA:FindFirstChild("Slots")
+					if slot and slots then
+						local items = slots:GetChildren()
+						table.sort(items, function(a, b)
+							return tonumber(a.Name) < tonumber(b.Name)
+						end)
+						local equipped = items[slot.Value]
+						equippedItem = equipped and equipped.Value or "N/A"
+					end
+				end)
+
+				local teamColor = player ~= LocalPlayer and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(0, 225, 225)
+
+local FS = player == LocalPlayer and "Size12" or "Size10"
+
+espGui.TextLabel.FontSize = FS
+				espGui.TextLabel.TextColor3 = teamColor
+				espGui.TextLabel.Text = ("%s | %.0f M\n%s - %s"):format(player.Name, distance, healthText, equippedItem)
+			end
+		end
+	end
+end
+
+-- Atualiza a ESP constantemente
+RunService.RenderStepped:Connect(updateESP)
+
+-- Aplica ESP em quem entrar
+Players.PlayerAdded:Connect(function(player)
+	player.CharacterAdded:Connect(function()
+		wait(1)
+		createESP(player)
+	end)
+end)
+
+-- Aplica ESP nos players já presentes
+for _, player in pairs(Players:GetPlayers()) do
+	if player ~= LocalPlayer then
+		if player.Character then
+			createESP(player)
+		end
+		player.CharacterAdded:Connect(function()
+			wait(1)
+			createESP(player)
+		end)
+	end
+end
+
+
+-- Notificação helper
+local function notify(title, text)
+    StarterGui:SetCore("SendNotification", {Title = title, Text = text, Duration = 3})
+end
+
+-- Touch começa
+touchArea.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+        if not PS then
+            local char = player.Character or player.CharacterAdded:Wait()
+            local hrp = char:WaitForChild("HumanoidRootPart")
+            PS = hrp.CFrame + Vector3.new(0, 5, 0)
+            
+        end
+        FCKING = true
+       
+    end
+end)
+
+-- Touch termina
+touchArea.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+task.wait(0.6)
+        FCKING = false
+for i = 1, 5 do
+task.wait(0.06)
+        if PS then
+            local char = player.Character or player.CharacterAdded:Wait()
+            char:SetPrimaryPartCFrame(PS)
+            
+        end
+end
+PS = nil
+
+    end
+end)
+
+-- Fundo de cor que fica girando a vibe
+local tempoTotal = 5
+local t = 0
+RunService.RenderStepped:Connect(function(dt)
+    t = t + dt
+    local p = (t % tempoTotal) / tempoTotal * math.pi * 2
+    touchArea.BackgroundColor3 = Color3.new(
+        0.5 + 0.5 * math.sin(p),
+        0.5 + 0.5 * math.sin(p + 2),
+        0.5 + 0.5 * math.sin(p + 4)
+    )
+end)
+-- Lista de posições insanas pra teleporte
+posicoes = {
+    Vector3.new(1e6, -499, 1e6),
+	Vector3.new(-1e6, -499, 1e6),
+	Vector3.new(1e6, -499, -1e6),
+	Vector3.new(-1e6, -499, -1e6),
+	Vector3.new(5e5, -499, 0),
+	Vector3.new(-5e5, -499, 0),
+	Vector3.new(0, -499, 5e5),
+	Vector3.new(0, -499, -5e5),
+	Vector3.new(123456, -499, 654321),
+	Vector3.new(-123456, -499, -654321),
+	Vector3.new(888888, -499, 444444),
+	Vector3.new(-888888, -499, -444444),
+	Vector3.new(777777, -499, 333333),
+	Vector3.new(-777777, -499, -333333),
+	Vector3.new(111111, -499, 222222),
+	Vector3.new(-111111, -499, -222222),
+	Vector3.new(696969, -499, 969696),
+	Vector3.new(-696969, -499, -969696),
+	Vector3.new(420420, -499, 420420),
+	Vector3.new(-420420, -499, -420420),
+}
+
+
+if game.PlaceId == 16190471004 then
+-- Lista de posições insanas pra teleporte
+posicoes = {
+    Vector3.new(1e6, -4900, 1e6),
+	Vector3.new(-1e6, -4900, 1e6),
+	Vector3.new(1e6, -4900, -1e6),
+	Vector3.new(-1e6, -4900, -1e6),
+	Vector3.new(5e5, -4900, 0),
+	Vector3.new(-5e5, -4900, 0),
+	Vector3.new(0, -4900, 5e5),
+	Vector3.new(0, -4900, -5e5),
+	Vector3.new(123456, -4900, 654321),
+	Vector3.new(-123456, -4900, -654321),
+	Vector3.new(888888, -4900, 444444),
+	Vector3.new(-888888, -4900, -444444),
+	Vector3.new(777777, -4900, 333333),
+	Vector3.new(-777777, -4900, -333333),
+	Vector3.new(111111, -4900, 222222),
+	Vector3.new(-111111, -4900, -222222),
+	Vector3.new(696969, -4900, 969696),
+	Vector3.new(-696969, -4900, -969696),
+	Vector3.new(420420, -4900, 420420),
+	Vector3.new(-420420, -4900, -420420),
+}
+
+elseif game.PlaceId == 17493357698 then
+
+StarterGui:SetCore("SendNotification", {
+    Title = "!! AVISO !!",
+    Text = "Partidas Classificadas Indentificado!!",
+    Duration = 5
+})
+
+
+posicoes = {
+    Vector3.new(-5e5, 5e5, -5e5),
+	Vector3.new(5e5, 5e5, 5e5),
+}
+
+end
+
+-- Teleporte louco com base de proteção
+local baseAtiva = false
+RunService.Heartbeat:Connect(function()
+    if FCKING then
+        local char = player.Character or player.CharacterAdded:Wait()
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            local pos = posicoes[math.random(1, #posicoes)]
+            local rot = math.rad(math.random(0, 360))
+            hrp.CFrame = CFrame.new(pos) * CFrame.Angles(0, rot, 0)
+            hrp.Velocity = Vector3.zero
+            hrp.RotVelocity = Vector3.zero
+
+            if not baseAtiva then
+                local base = Instance.new("Part")
+                base.Anchored = true
+                base.Size = Vector3.new(10, 2, 10)
+                base.Position = Vector3.new(pos.X, pos.Y - 5, pos.Z)
+                base.Transparency = 0.5
+                base.Color = Color3.new(1, 0, 0)
+                base.Material = Enum.Material.Neon
+                base.Name = "SafeBase"
+                base.Parent = Workspace
+                game.Debris:AddItem(base, 10)
+                
+            end
+        end
+    end
+end)
+
+-- Se cair do mapa, teleporta pra cima
+RunService.RenderStepped:Connect(function()
+    local char = player.Character or player.CharacterAdded:Wait()
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if hrp and not FCKING and not FCKING2 and hrp.Position.Y < (0 + DD2) then
+        hrp.CFrame = CFrame.new(400, 1200, 0)
+        
+    end
+end)
+
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local function setClosestPlayerAsTarget()
+	local character = LocalPlayer.Character
+	if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+
+	local closestPlayer = nil
+	local shortestDistance = math.huge
+
+	for _, player in ipairs(Players:GetPlayers()) do
+		if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+			local distance = (character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
+			if distance < shortestDistance then
+				shortestDistance = distance
+				closestPlayer = player
+			end
+		end
+	end
+
+	if closestPlayer then
+		_G.TARGET_PLAYER = closestPlayer.Name
+	end
+end
+
+
+
+-- Botão clonado que teleporta o player pra cima com chão invisível
+local mobileGui = playerGui:FindFirstChild("Mobile")
+if mobileGui then
+    local dashButton = mobileGui:FindFirstChild("Dash")
+    local runButton = mobileGui:FindFirstChild("Run")
+
+    if dashButton and runButton then
+        local cloneDash = dashButton:Clone()
+        cloneDash.Size = UDim2.new(0.18, 0, 0.18, 0)
+        cloneDash.Position = UDim2.new(0.35, 0, 0.6, 0)
+        cloneDash.Parent = mobileGui
+
+        local cloneRun = runButton:Clone()
+        cloneRun.Size = UDim2.new(0.18, 0, 0.18, 0)
+        cloneRun.Position = UDim2.new(0.6, 0, 0.6, 0)
+        cloneRun.Parent = mobileGui
+
+                  
+     cloneRun.MouseButton1Down:Connect(function()
+
+
+local icon = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+    :WaitForChild("Mobile"):WaitForChild("Lock"):WaitForChild("Icon")
+
+local color = icon.ImageColor3
+local resultado = (color.r == 0 and color.g == 0 and color.b == 0) -- true se preto
+
+
+if resultado then
+local txt = ""
+ 
+ if not SuperClicks then
+ txt = "O NOVO SISTEMA DE CLICKS ABSOLUTOS ATIVADOS!"
+ else
+ txt = "Sistema Desabilitado..."
+ 
+ end
+ SuperClicks = not (SuperClicks)
+notify("Super Click!", txt)
+return
+end
+
+
+local icon = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+    :WaitForChild("Mobile"):WaitForChild("Run"):WaitForChild("Icon")
+
+local color = icon.ImageColor3
+local resultado = (color.r == 0 and color.g == 0 and color.b == 0) -- true se preto
+
+
+if resultado then
+if DDY == 80 then
+_G.SPEED1 = 40
+_G.SPEED2 = 1.4
+DDY = 120
+notify("Velocidade Modificada", "Velocidade , top do top...")
+return
+else
+_G.SPEED1 = 28
+_G.SPEED2 = 0.725
+DDY = 80
+notify("Velocidade Normal", "Velocidade mais oroxima do jogo em si...")
+return
+end
+
+end
+
+local icon = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+    :WaitForChild("Mobile"):WaitForChild("Jump"):WaitForChild("Icon")
+
+local color = icon.ImageColor3
+local resultado = (color.r == 0 and color.g == 0 and color.b == 0) -- true se preto
+
+
+if resultado then
+
+GGHI = not (GGHI)
+
+if GGHI then
+
+notify("Aimbot Inteligente Inativo.", "Pelo visto você não gostou disto :(")
+SENSIBILIDADE = 0
+return
+else
+
+notify("Aimbot Ativo!", "Vou analizar o jogador mais consciente.")
+SENSIBILIDADE = 9
+return
+end
+
+end
+
+local icon = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+    :WaitForChild("Mobile"):WaitForChild("Block"):WaitForChild("Icon")
+
+local color = icon.ImageColor3
+local resultado = (color.r == 0 and color.g == 0 and color.b == 0) -- true se preto
+
+
+if resultado then
+if _G.Iper then
+
+_G.Iper = false
+else
+_G.Iper = true
+end
+
+
+
+
+
+if _G.Iper then
+_G.SPEED1 = 40
+_G.SPEED2 = 1.4
+DDY = 120
+
+
+notify("Fim!", "Abilidades normalmente...")
+
+return
+else
+
+_G.SPEED1 = 165
+_G.SPEED2 = 2.25
+DDY = 200
+
+notify("IPER! ACIONADA!", "Novos poderes foram aprimorados!")
+
+return
+end
+
+
+end
+
+setClosestPlayerAsTarget()
+
+
+            task.wait(1)
+
+
+_G.XXXY = true
+task.wait(1.5)
+_G.XXXY = false
+
+
+end)
+
+     cloneDash.MouseButton1Down:Connect(function()
+            
+
+cloneDash.Active = false
+            local char = player.Character or player.CharacterAdded:Wait()
+            local hrp = char:WaitForChild("HumanoidRootPart")
+            local lookVector = hrp.CFrame.LookVector
+            local forwardOffset = Vector3.new(lookVector.X * 200, 0, lookVector.Z * 30)
+            local highPos = hrp.Position + forwardOffset + Vector3.new(0, 100, 0)
+            local newCf = CFrame.new(highPos, highPos + Vector3.new(lookVector.X, 0, lookVector.Z))
+            char:SetPrimaryPartCFrame(newCf)
+
+            -- Chão invisível
+            local floor = Instance.new("Part")
+            floor.Size = Vector3.new(8, 1, 8)
+            floor.Position = hrp.Position - Vector3.new(0, 1, 0)
+            floor.Anchored = true
+            floor.Transparency = 0.75
+            floor.CanCollide = true
+            floor.Parent = Workspace
+
+            pcall(function()
+                PhysicsService:CreateCollisionGroup("PlayerFloor")
+                PhysicsService:CreateCollisionGroup("Player")
+            end)
+            PhysicsService:SetPartCollisionGroup(floor, "PlayerFloor")
+            PhysicsService:SetPartCollisionGroup(hrp, "Player")
+
+            task.spawn(function()
+                while (floor.Position - hrp.Position).Magnitude <= 70 do
+                    task.wait(1)
+                end
+                local fadeTween = TweenService:Create(floor, TweenInfo.new(1), {Transparency = 1})
+                fadeTween:Play()
+                fadeTween.Completed:Wait()
+                floor:Destroy()
+            end)
+
+            cloneDash.Active = true
+
+        end)
+    else
+        warn("Botões Dash ou Run não encontrados.")
+    end
+else
+    warn("Mobile GUI não encontrado.")
+end
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+-- Elocal Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local function duplicarPulo(char)
+	local humanoid = char:WaitForChild("Humanoid")
+	humanoid.JumpPower = DDY
+end
+
+-- Aplica ao personagem atual
+if player.Character then
+	duplicarPulo(player.Character)
+end
+
+-- Aplica sempre que respawnar
+player.CharacterAdded:Connect(function(char)
+	duplicarPulo(char)
+end)
+
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Heartbeat = RunService.Heartbeat
+
+_G.XXXY = false
+
+local lastTargetPos = nil
+
+Heartbeat:Connect(function()
+	if not _G.XXXY then return end
+
+	local character = LocalPlayer.Character
+	if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+
+	local targetPlayer = Players:FindFirstChild(_G.TARGET_PLAYER)
+	if not targetPlayer or not targetPlayer.Character or not targetPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
+
+	local targetPos = targetPlayer.Character.HumanoidRootPart.Position
+	local currentPos = character.HumanoidRootPart.Position
+
+	if (currentPos - targetPos).Magnitude > 1 then
+		character:SetPrimaryPartCFrame(CFrame.new(targetPos))
+		lastTargetPos = targetPos
+	end
+end)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+local camera = workspace.CurrentCamera
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Configuração
+SENSIBILIDADE = 9 -- quanto maior, mais distante a predição
+
+-- UI da área
+local screenGui = Instance.new("ScreenGui", playerGui)
+screenGui.ResetOnSpawn = false
+
+local touchArea = Instance.new("Frame")
+touchArea.Size = UDim2.new(0.3, 0, 0.3, 0) 
+touchArea.Position = UDim2.new(0.75, 0, -0.195, 0)
+touchArea.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+touchArea.BackgroundTransparency = 0.85
+touchArea.Active = true
+touchArea.Parent = screenGui
+
+-- Dados e controle
+local tracking = false
+local trackedPlayer = nil
+local lerping = false
+local lerpProgress = 0
+local maxHistory = 30
+local historyMap = {} -- player -> posições anteriores
+
+-- Salva as posições dos jogadores em segundo plano
+RunService.Heartbeat:Connect(function()
+	for _, plr in ipairs(Players:GetPlayers()) do
+		if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+			local hrp = plr.Character.HumanoidRootPart
+			local pos = Vector3.new(hrp.Position.X, 0, hrp.Position.Z)
+
+			historyMap[plr] = historyMap[plr] or {}
+			local history = historyMap[plr]
+			table.insert(history, pos)
+
+			if #history > maxHistory then
+				table.remove(history, 1)
+			end
+		end
+	end
+end)
+
+-- Pega o player mais próximo
+function getClosestPlayer()
+	local myChar = player.Character
+	if not myChar or not myChar:FindFirstChild("HumanoidRootPart") then return nil end
+	local myPos = myChar.HumanoidRootPart.Position
+
+	local closest = nil
+	local minDist = math.huge
+
+	for _, plr in ipairs(Players:GetPlayers()) do
+		if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+			local dist = (plr.Character.HumanoidRootPart.Position - myPos).Magnitude
+			if dist < minDist then
+				minDist = dist
+				closest = plr
+			end
+		end
+	end
+
+	return closest
+end
+
+-- Predição avançada
+local function predictPosition(plr)
+	if not plr or not plr.Character then return nil end
+	local hrp = plr.Character:FindFirstChild("HumanoidRootPart")
+	if not hrp then return nil end
+
+	local currentY = hrp.Position.Y
+	local history = historyMap[plr]
+	if not history or #history < 2 then
+		return hrp.Position
+	end
+
+	local totalDelta = Vector3.zero
+	local validDeltas = 0
+
+	for i = 2, #history do
+		local delta = history[i] - history[i - 1]
+		if delta.Magnitude > 0.1 then
+			totalDelta += delta
+			validDeltas += 1
+		end
+	end
+
+	if validDeltas == 0 then
+		local center = Vector3.zero
+		for _, p in ipairs(history) do center += p end
+		center /= #history
+		return Vector3.new(center.X, currentY, center.Z)
+	end
+
+	local velocity = totalDelta / validDeltas
+	local predicted = history[#history] + velocity.Unit * math.min(velocity.Magnitude * 4 * SENSIBILIDADE, 20)
+	return Vector3.new(predicted.X, currentY, predicted.Z)
+end
+
+-- Mira atualizada
+RunService.RenderStepped:Connect(function(dt)
+	if tracking and trackedPlayer then
+		local prediction = predictPosition(trackedPlayer)
+		if prediction then
+			if lerping then
+				lerpProgress += dt * 8
+				if lerpProgress >= 1 then
+					lerping = false
+					lerpProgress = 0
+				end
+				camera.CFrame = camera.CFrame:Lerp(CFrame.lookAt(camera.CFrame.Position, prediction), lerpProgress)
+			else
+				camera.CFrame = CFrame.lookAt(camera.CFrame.Position, prediction)
+			end
+		end
+	end
+end)
+
+-- Começou toque
+touchArea.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+		trackedPlayer = getClosestPlayer()
+		if trackedPlayer then
+			tracking = true
+			lerping = true
+			lerpProgress = 0
+		end
+	end
+end)
+
+-- Terminou toque
+touchArea.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+task.wait(0.85)
+		tracking = false
+		trackedPlayer = nil
+		lerping = false
+		lerpProgress = 0
+	end
+end)
+
+task.spawn(function()
+
+while true do task.wait(0.5)
+
+
+pcall(function()
+
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local function duplicarPulo(char)
+	local humanoid = char:WaitForChild("Humanoid")
+	humanoid.JumpPower = DDY
+end
+
+-- Aplica ao personagem atual
+if player.Character then
+	duplicarPulo(player.Character)
+end
+
+
+
+
+end)
+end
+
+end)
+
+
+
+
+
+
+-- Botão clonado que teleporta o player pra cima com chão invisível
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local mobileGui = playerGui:FindFirstChild("Mobile")
+if mobileGui then
+    local dashButton = mobileGui:FindFirstChild("Dash")
+    local runButton = mobileGui:FindFirstChild("Run")
+
+    if dashButton and runButton then
+        local cloneDash = dashButton:Clone()
+        CD = cloneDash
+        cloneDash.Size = UDim2.new(0.15, 0, 0.15, 0)
+        cloneDash.Position = UDim2.new(0.92, 0, 0.12, 0)
+        cloneDash.Parent = mobileGui
+
+cloneDash.MouseButton1Down:Connect(function()
+            
+        local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+
+-- Salva posição original
+local originalPosition = HumanoidRootPart.Position
+
+-- Função pra pegar o player mais próximo
+getNearestPlayer = function()
+	local closestPlayer = nil
+	local shortestDistance = math.huge
+
+	for _, player in ipairs(Players:GetPlayers()) do
+		if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+			local distance = (HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
+			if distance < shortestDistance then
+				shortestDistance = distance
+				closestPlayer = player
+			end
+		end
+	end
+
+	return closestPlayer
+end
+
+GNP = getNearestPlayer
+
+-- Main
+local targetPlayer = getNearestPlayer()
+if not targetPlayer or not targetPlayer.Character or not targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+	warn("Nenhum player encontrado")
+	return
+end
+
+FCKING2 = true
+-- Posição isolada no limbo
+local limboPosition = Vector3.new(5e5, -480, 5e5)
+
+-- Cria uma plataforma no limbo
+local platform = Instance.new("Part")
+platform.Size = Vector3.new(20, 1, 20)
+platform.Position = limboPosition - Vector3.new(0, 2, 0)
+platform.Anchored = true
+platform.Name = "LimboPlatform"
+platform.Parent = workspace
+
+task.spawn(function()
+
+
+-- Script 1: Congelar a câmera no lugar atual
+
+local player = game.Players.LocalPlayer
+local camera = workspace.CurrentCamera
+
+-- Pega a posição e rotação atuais da câmera
+local camCFrame = camera.CFrame
+
+-- Define a câmera como Scriptable (modo livre)
+camera.CameraType = Enum.CameraType.Scriptable
+
+-- Fixa a câmera na posição atual
+camera.CFrame = camCFrame
+end)
+
+-- Teleporta pro limbo
+HumanoidRootPart.CFrame = CFrame.new(limboPosition)
+
+-- Repete zerando a velocidade
+local heartbeatConnection
+heartbeatConnection = RunService.Heartbeat:Connect(function()
+	if Character and HumanoidRootPart then
+		HumanoidRootPart.Velocity = Vector3.zero
+	end
+end)
+
+-- Espera 1 segundo
+task.delay(1, function()
+	-- Desconecta o repetidor
+	if heartbeatConnection then
+		heartbeatConnection:Disconnect()
+	end
+
+	-- Remove a plataforma
+	if platform and platform.Parent then
+		platform:Destroy()
+	end
+
+	-- Teleporta até o player salvo
+	local targetHRP = targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+	if targetHRP then
+		HumanoidRootPart.CFrame = targetHRP.CFrame
+
+		-- Espera 2 segundos antes de começar a voltar
+		task.delay(2, function()
+			-- Posição final do retorno (original + 40 em Y)
+			local returnPosition = originalPosition + Vector3.new(0, 40, 0)
+
+FCKING2 = false
+task.spawn(function()
+-- Script 2: Voltar a câmera pro jogador
+
+local player = game.Players.LocalPlayer
+local camera = workspace.CurrentCamera
+
+-- Volta para o modo padrão (acompanha o player de novo)
+camera.CameraType = Enum.CameraType.Custom
+
+end)
+
+
+			-- Loop de volta
+			for i = 1, 30 do
+				HumanoidRootPart.CFrame = CFrame.new(returnPosition)
+				task.wait()
+			end
+		end)
+	end
+end)
+
+        end)
+    end -- fecha if dashButton and runButton
+end -- fecha if mobileGui
+
+
+task.spawn(function()
+    while true do
+        task.wait(0.5)
+
+        local Players = game:GetService("Players")
+        local player = Players.LocalPlayer
+
+        local equippedItem2 = "???"
+        local success, err = pcall(function()
+            local slot = player:FindFirstChild("MAIN_DATA") and player.MAIN_DATA:FindFirstChild("Slot")
+            local slots = player.MAIN_DATA and player.MAIN_DATA:FindFirstChild("Slots")
+            if slot and slots then
+                local items = slots:GetChildren()
+                table.sort(items, function(a, b)
+                    return tonumber(a.Name) < tonumber(b.Name)
+                end)
+                local equipped = items[slot.Value]
+                equippedItem2 = equipped and equipped.Value or "N/A"
+            end
+        end)
+
+        if equippedItem2 == "LightV2" then
+            CD.Position = UDim2.new(0.92, 0, 0.12, 0)
+        else
+            CD.Position = UDim2.new(5, 0, 0.12, 0)
+        end
+    end
+end)
+
+
+
+
+
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+
+-- Função pra pegar o personagem
+local function getChar(player)
+	return player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character
+end
+
+-- Função pra pegar o player mais próximo do centro da tela
+function getClosestPlayerToCenter()
+	local closestPlayer = nil
+	local closestDistance = math.huge
+	local center = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+
+	for _, player in ipairs(Players:GetPlayers()) do
+		if player ~= LocalPlayer then
+			local char = getChar(player)
+			if char then
+				local pos, onScreen = Camera:WorldToViewportPoint(char.HumanoidRootPart.Position)
+				if onScreen then
+					local screenPos = Vector2.new(pos.X, pos.Y)
+					local dist = (screenPos - center).Magnitude
+					if dist < closestDistance then
+						closestDistance = dist
+						closestPlayer = player
+					end
+				end
+			end
+		end
+	end
+
+	return closestPlayer
+end
+
+-- TELEPORTE INSANO
+local function teleportToClosest()
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+
+local closestPlayer = nil
+local shortestDistance = math.huge
+
+for _, player in pairs(Players:GetPlayers()) do
+	if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+		local targetHRP = player.Character.HumanoidRootPart
+		local distance = (HumanoidRootPart.Position - targetHRP.Position).Magnitude
+
+		if distance < shortestDistance then
+			shortestDistance = distance
+			closestPlayer = player
+		end
+	end
+end
+
+
+ targetPlayer = closestPlayer
+	
+	
+	if not targetPlayer then warn("Nenhum player na tela") return end
+
+DDS = true
+		
+		
+for i = 1, 70 do
+pcall(function()
+	local targetChar = getChar(targetPlayer)
+	local localChar = getChar(LocalPlayer)
+	if not targetChar or not localChar then return end
+
+	local hrp = localChar.HumanoidRootPart
+	local targetHrp = targetChar.HumanoidRootPart
+
+	local direction = (hrp.Position - targetHrp.Position).Unit
+	local newPosition = targetHrp.Position + direction * 4.55
+
+	hrp.CFrame = CFrame.new(newPosition, targetHrp.Position)
+	task.wait()
+	end)
+	end
+	
+	task.wait(1)
+	DDS = false
+end
+
+
+
+
+
+
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local mobileGui = playerGui:FindFirstChild("Mobile")
+if mobileGui then
+    
+    local runButton = mobileGui:FindFirstChild("Use")
+
+    if runButton then
+    runButton.MouseButton1Down:Connect(function()
+            if SuperClicks then
+            local Players = game:GetService("Players")
+        local player = Players.LocalPlayer
+
+        local equippedItem2 = "???"
+        local success, err = pcall(function()
+            local slot = player:FindFirstChild("MAIN_DATA") and player.MAIN_DATA:FindFirstChild("Slot")
+            local slots = player.MAIN_DATA and player.MAIN_DATA:FindFirstChild("Slots")
+            if slot and slots then
+                local items = slots:GetChildren()
+                table.sort(items, function(a, b)
+                    return tonumber(a.Name) < tonumber(b.Name)
+                end)
+                local equipped = items[slot.Value]
+                equippedItem2 = equipped and equipped.Value or "N/A"
+            end
+        end)
+
+
+
+        local allowedItems = {
+	LightV2 = true,
+	DoughV2 = true,
+	IceV2 = true,
+	Love = true,
+	Soul = true,
+	Paw = true,
+	FrameV2 = true,
+	Leopard = true,
+	Lightning = true,
+	String = true,
+	FlameV2 = true,
+	Falcon = true,
+ LeopardV2 = true,
+ Magnet= true,
+ TSRubber = true,
+ DarkXQuake = true,
+ Darkness = true,
+ Snow = true,
+}
+
+if allowedItems[equippedItem2] then
+
+
+        
+            teleportToClosest()
+            else
+            notify("Fruta não listada!!", "Ingelfelizmente essa opção não está disponível para sua fruta. ( fumcaonção desativada )")
+            SuperClicks = false
+            end
+            end
+            
+            
+               
+            
+            end)
+    end
+    end 
+    
+    
+    local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+RunService.RenderStepped:Connect(function()
+if not DDS then
+return
+
+end
+
+	local closestPlayer
+	local closestDist = math.huge
+
+	for _, player in pairs(Players:GetPlayers()) do
+		if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+			local dist = (player.Character.HumanoidRootPart.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+			if dist < closestDist then
+				closestDist = dist
+				closestPlayer = player
+			end
+		end
+	end
+
+	if closestPlayer and closestPlayer.Character and closestPlayer.Character:FindFirstChild("HumanoidRootPart") then
+		local myPos = Camera.CFrame.Position
+		local targetPos = closestPlayer.Character.HumanoidRootPart.Position
+		targetPos = Vector3.new(targetPos.X, myPos.Y, targetPos.Z) -- mesmo Y da câmera atual
+
+		Camera.CFrame = CFrame.new(myPos, targetPos)
+	end
+end) 
+
+
+hotbarSlotsVerificar = {}
+task.spawn(function()
+
+
+while true do task.wait(0.5)
+local Players = game:GetService("Players")
+        local player = Players.LocalPlayer
+
+        local equippedItem2 = "???"
+        local success, err = pcall(function()
+            local slot = player:FindFirstChild("MAIN_DATA") and player.MAIN_DATA:FindFirstChild("Slot")
+            local slots = player.MAIN_DATA and player.MAIN_DATA:FindFirstChild("Slots")
+            if slot and slots then
+                local items = slots:GetChildren()
+                table.sort(items, function(a, b)
+                    return tonumber(a.Name) < tonumber(b.Name)
+                end)
+                local equipped = items[slot.Value]
+                equippedItem2 = equipped and equipped.Value or "N/A"
+            end
+        end)
+
+ATO = 0
+if equippedItem2 == "Lightning" then
+ATO = 1
+hotbarSlotsVerificar = {2, 5}
+elseif equippedItem2 == "DoughV2" then
+ATO = 1
+hotbarSlotsVerificar = {2}
+elseif equippedItem2 == "LeopardV2" then
+ATO = 1
+hotbarSlotsVerificar = {3}
+elseif equippedItem2 == "Love" then
+ATO = 1
+hotbarSlotsVerificar = {2}
+elseif equippedItem2 == "IceV2" then
+ATO = 1
+hotbarSlotsVerificar = {3}
+elseif equippedItem2 == "Magnet" then
+ATO = 1
+hotbarSlotsVerificar = {4}
+else
+ATO = 0
+hotbarSlotsVerificar = {}
+end
+
+if equippedItem2 == "FlameVJ2" then
+ATO = 2
+hotbarSlotsVerificar = {2, 3}
+end
+
+if not _G.AimV2 then
+
+hotbarSlotsVerificar = {}
+
+end
+
+
+
+end
+end)
+
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local StarterGui = game:GetService("StarterGui")
+
+local estaComCor = false
+local corAlvo = Color3.fromRGB(42, 44, 40)
+
+-- AQUI TÁ A LISTA QUE VOCÊ PODE MUDAR!
+
+RunService.RenderStepped:Connect(function()
+	pcall(function()
+		local hotbar = Players.LocalPlayer.PlayerGui.UI.Hotbar
+		local algumSlotSemCor = false
+
+		for _, slotIndex in ipairs(hotbarSlotsVerificar) do
+			local slot = hotbar:FindFirstChild(tostring(slotIndex))
+			
+			
+			if slot then
+				if slot.BackgroundColor3 ~= corAlvo then
+				
+				
+        
+					algumSlotSemCor = true
+					break
+				end
+			end
+		end
+		
+		
+		if algumSlotSemCor then
+		
+		
+			if not estaComCor then
+				AS = (SENSIBILIDADE + 0)
+				SENSIBILIDADE = 4
+
+if ATO == 1 or ATO == 3 then
+				trackedPlayer = getClosestPlayer()
+				if trackedPlayer then
+					tracking = true
+					lerping = true
+					lerpProgress = 0
+				end
+				end
+				
+				if ATO == 2 then
+				if not (SVSPEED1) then
+				SVSPEED1 = _G.SPEED1
+				SVSPEED2 = _G.SPEED2
+				end
+				
+				task.wait(1)
+				
+				_G.SPEED1 = 55
+_G.SPEED2 = 1.8
+
+				end
+
+				estaComCor = true
+			end
+		else
+			if estaComCor then
+				task.wait(1)
+				SENSIBILIDADE = AS
+				tracking = false
+				trackedPlayer = nil
+				lerping = false
+				lerpProgress = 0
+
+if ATO == 2 then
+
+				if (SVSPEED1) then
+				_G.SPEED1 = SVSPEED1
+				_G.SPEED2 = SVSPEED2
+				end
+				end
+
+				estaComCor = false
+			end
+		end
+	end)
+end)
+
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local localPlayer = Players.LocalPlayer
+local walls = {}        -- [player] = wall
+local DIST_LIMIT = 400  -- distância máxima permitida
+
+-- Cria parede
+local function createWall(player)
+	local wall = Instance.new("Part")
+	wall.Size = Vector3.new(55, 55, 1)
+	wall.Anchored = true
+	wall.CanCollide = true
+	wall.Transparency = 0.80
+	wall.BrickColor = BrickColor.new("Really red")
+		wall.Material = Enum.Material.ForceField
+	wall.Name = "ParedeStalker_" .. player.Name
+	wall.Parent = workspace
+	walls[player] = wall
+end
+
+-- Remove parede
+local function removeWall(player)
+	if walls[player] then
+		walls[player]:Destroy()
+		walls[player] = nil
+	end
+end
+
+-- Loop principal
+RunService.Heartbeat:Connect(function()
+	local myChar = localPlayer.Character
+	local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+	if not myHRP then return end
+
+	for _, player in ipairs(Players:GetPlayers()) do
+		if player ~= localPlayer then
+			local char = player.Character
+			local hrp = char and char:FindFirstChild("HumanoidRootPart")
+			local humanoid = char and char:FindFirstChildOfClass("Humanoid")
+			local alive = humanoid and humanoid.Health > 0
+			local isValid = char and hrp and alive and Players:GetPlayerFromCharacter(char)
+
+			if isValid then
+				local dist = (myHRP.Position - hrp.Position).Magnitude
+				if dist <= DIST_LIMIT then
+					-- Dentro da distância, cria se não tiver
+					if not walls[player] then
+						createWall(player)
+					end
+
+					-- Atualiza parede
+					local wall = walls[player]
+					if wall and wall.Parent then
+						local toLocal = (myHRP.Position - hrp.Position).Unit
+						local wallPos = hrp.Position - toLocal * 15
+						wall.CFrame = CFrame.new(wallPos, myHRP.Position)
+					end
+				else
+					-- Tá longe demais, remove
+					removeWall(player)
+				end
+			else
+				-- Invalido: morto, sem personagem, etc
+				removeWall(player)
+			end
+		end
+	end
+
+	-- Limpeza de players que sumiram do universo
+	for player in pairs(walls) do
+		if not Players:FindFirstChild(player.Name) then
+			removeWall(player)
+		end
+	end
+end)
+
+-- Quando sair do jogo
+Players.PlayerRemoving:Connect(function(player)
+	removeWall(player)
+end)
+
+end)
+
+if success then
+    notify("Sucesso! Resultado: " .. tostring(result))
+else
+    notify("ERRO DETECTADO! 😵‍💫\n" .. tostring(result))
+end
