@@ -1,4 +1,16 @@
---V6.5
+--V7.0
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local function notify(msg)
+    local hint = Instance.new("Hint", player:WaitForChild("PlayerGui"))
+    hint.Text = msg
+    task.delay(3, function() hint:Destroy() end)
+end
+
+local success, result = pcall(function()
+    
 
 local player = game.Players.LocalPlayer
 if not player.Character then
@@ -1329,21 +1341,33 @@ local Players = game:GetService("Players")
             end
         end)
 
+ATO = 0
 if equippedItem2 == "Lightning" then
-
+ATO = 1
 hotbarSlotsVerificar = {2, 5}
 elseif equippedItem2 == "DoughV2" then
+ATO = 1
 hotbarSlotsVerificar = {2}
 elseif equippedItem2 == "LeopardV2" then
+ATO = 1
 hotbarSlotsVerificar = {3}
 elseif equippedItem2 == "Love" then
+ATO = 1
 hotbarSlotsVerificar = {2}
 elseif equippedItem2 == "IceV2" then
+ATO = 1
 hotbarSlotsVerificar = {3}
 elseif equippedItem2 == "Magnet" then
+ATO = 1
 hotbarSlotsVerificar = {4}
 else
+ATO = 0
 hotbarSlotsVerificar = {}
+end
+
+if equippedItem2 == "FlameVJ2" then
+ATO = 2
+hotbarSlotsVerificar = {2, 3}
 end
 
 if not _G.AimV2 then
@@ -1394,11 +1418,26 @@ RunService.RenderStepped:Connect(function()
 				AS = (SENSIBILIDADE + 0)
 				SENSIBILIDADE = 4
 
+if ATO == 1 or ATO == 3 then
 				trackedPlayer = getClosestPlayer()
 				if trackedPlayer then
 					tracking = true
 					lerping = true
 					lerpProgress = 0
+				end
+				end
+				
+				if ATO == 2 then
+				if not (SVSPEED1) then
+				SVSPEED1 = _G.SPEED1
+				SVSPEED2 = _G.SPEED2
+				end
+				
+				task.wait(1)
+				
+				_G.SPEED1 = 55
+_G.SPEED2 = 1.8
+
 				end
 
 				estaComCor = true
@@ -1411,6 +1450,14 @@ RunService.RenderStepped:Connect(function()
 				trackedPlayer = nil
 				lerping = false
 				lerpProgress = 0
+
+if ATO == 2 then
+
+				if (SVSPEED1) then
+				_G.SPEED1 = SVSPEED1
+				_G.SPEED2 = SVSPEED2
+				end
+				end
 
 				estaComCor = false
 			end
@@ -1500,3 +1547,11 @@ end)
 Players.PlayerRemoving:Connect(function(player)
 	removeWall(player)
 end)
+
+end)
+
+if success then
+    notify("Sucesso! Resultado: " .. tostring(result))
+else
+    notify("ERRO DETECTADO! 😵‍💫\n" .. tostring(result))
+end
