@@ -1,3 +1,92 @@
+local tool = Instance.new("Tool")
+tool.Name = "🚀BOOSTER"
+tool.RequiresHandle = false
+tool.Parent = game.Players.LocalPlayer.Backpack
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+local hrp
+local velocityConstraint -- Renomeado para a nova restrição
+local attachment -- Um anexo será necessário
+
+local BOOST_SPEED = 150 -- Reduzido um pouco para estabilidade, ajuste se precisar
+
+local conn
+
+local function createBooster(character)
+    hrp = character:WaitForChild("HumanoidRootPart")
+
+    -- 1. Cria um Attachment no HumanoidRootPart
+    attachment = Instance.new("Attachment")
+    attachment.Parent = hrp
+
+    -- 2. Cria a restrição LinearVelocity
+    velocityConstraint = Instance.new("LinearVelocity")
+    velocityConstraint.Attachment0 = attachment
+    
+    -- Controla a força máxima que pode ser aplicada. Deve ser alto!
+    velocityConstraint.MaxForce = 1e6 
+    
+    -- Define o modo de velocidade para Vector, que permite controlar a direção diretamente.
+    velocityConstraint.VectorVelocity = Vector3.new(0, 0, 0)
+    
+    -- O modo "Line" tentará mover a peça ao longo de uma linha. 
+    -- Para um booster, "Vector" (velocidade pura) ou "Plane" (velocidade em um plano) pode ser melhor, mas Vector é o mais direto.
+    -- Vamos usar Vector e atualizá-lo constantemente.
+    velocityConstraint.RelativeTo = Enum.ActuatorRelativeTo.World -- Move em relação ao mundo (importante para o VectorVelocity)
+    velocityConstraint.Parent = hrp
+end
+
+tool.Activated:Connect(function()
+    local char = player.Character or player.CharacterAdded:Wait()
+    
+    -- Cria a restrição apenas se ela ainda não existir
+    if not velocityConstraint or not velocityConstraint.Parent then
+        createBooster(char)
+    end
+    
+    -- Certifica-se de que a conexão está limpa antes de criar uma nova
+    if conn then
+        conn:Disconnect()
+    end
+
+    -- 3. Loop para atualizar a velocidade
+    conn = RunService.Heartbeat:Connect(function()
+        if hrp and velocityConstraint.Parent == hrp then
+            local camDir = workspace.CurrentCamera.CFrame.LookVector
+            -- Adiciona a velocidade da câmera, e a componente Y para o efeito de "boost para cima"
+            velocityConstraint.VectorVelocity = camDir * (BOOST_SPEED *2) + Vector3.new(0, BOOST_SPEED * 1.5, 0)
+        else
+            -- Se o HumanoidRootPart ou a restrição sumir, desliga o loop
+            conn:Disconnect()
+            velocityConstraint:Destroy()
+            attachment:Destroy()
+            velocityConstraint, attachment, hrp = nil, nil, nil
+        end
+    end)
+end)
+
+tool.Unequipped:Connect(function()
+    if conn then
+        conn:Disconnect()
+        conn = nil
+    end
+    if velocityConstraint then
+        velocityConstraint:Destroy()
+        velocityConstraint = nil
+    end
+    if attachment then
+        attachment:Destroy()
+        attachment = nil
+    end
+    hrp = nil
+end)
+
+
+
+
 local MatsuneA1 = {};
 
 MatsuneA1["1"] = Instance.new("ScreenGui", game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"));
