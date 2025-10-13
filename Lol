@@ -1,3 +1,5 @@
+-- EZ
+
 local MatsuneA1 = {};
 
 MatsuneA1["1"] = Instance.new("ScreenGui", game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"));
@@ -4792,7 +4794,7 @@ local Status = AutoStatus:Section("Status Number","Left")
 local StatusTime = AutoStatus:Section("Status Time Game","Right")
 
 _G.SelectWeapon = "Melee"
-  AutoFarm:Dropdown("Select Weapons",{"Melee","Sword","Gun","Blox Fruit"},{"Melee"},function(v)
+  AutoFarm:Dropdown("Select Weapons",{"Melee","Sword","Gun","Blox Fruit"},{"Blox Fruit"},function(v)
     _G.SelectWeapon = v
      end)
 
@@ -4823,7 +4825,7 @@ _G.SelectWeapon = "Melee"
 						end
 					end
 				end
-			elseif _G.SelectWeapon == "Fruit" then
+			elseif _G.SelectWeapon == "Blox Fruit" then
 				for i ,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
 					if v.ToolTip == "Blox Fruit" then
 						if game.Players.LocalPlayer.Backpack:FindFirstChild(tostring(v.Name)) then
