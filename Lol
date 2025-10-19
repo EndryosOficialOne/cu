@@ -62,7 +62,7 @@ MatsuneA1["4"].MouseButton1Click:Connect(function()
     StopTween()
 end)
 
-_G.FastAttack = false
+_G.FastAttack = true
 
 if _G.FastAttack then
     local _ENV = (getgenv or getrenv or getfenv)()
@@ -4981,93 +4981,222 @@ _G.SelectWeapon = "Melee"
      
      if World1 or World2 then
      AutoFarm:Dropdown("Select Regime Farm",{"Farm Level Mastery", "Farm Level Mastery No Quest"},{"Farm Level Mastery No Quest"},function(Value)
-       _G.selectFruitFarm = Value
+       -- _G.selectFruitFarm = Value
       end)
     end      
       if World3 then
     AutoFarm:Dropdown("Select Regime Farm",{"Farm Level Mastery", "Farm Level Mastery No Quest","Farm Bone Mastery","Farm Cake Mastery"},{"Farm Level Mastery No Quest"},function(Value)
-       _G.selectFruitFarm = Value
+      -- _G.selectFruitFarm = Value
       end)
     end      
+AutoFarm:Toggle("Auto Farm Mastery Fruit V2", false,function(value)
+
+_G.AutoFarmFruits2 = value
+end)
 
       AutoFarm:Toggle("Auto Farm Mastery Fruit", false,function(value)
-         _G.AutoFarmFruits = value 
+      Mtry = value
+      
+      task.spawn(function()
+      while Mtry do
+      
+      _G.selectFruitFarm = "Farm Level Mastery"
+      task.wait(5)
+      _G.selectFruitFarm = "Farm Level Mastery No Quest"
+      task.wait(5)
+      
+      end
+      end)
+      
+      
+      task.spawn(function()
+      while Mtry do
+      
+      _G.AutoFarmFruits = true
          StopTween(_G.AutoFarmFruits)
+         
+      task.wait(8)
+      _G.AutoFarmFruits = false
+         StopTween(_G.AutoFarmFruits)
+         task.wait(0.2)
+      end
+      
+      _G.AutoFarmFruits = false
+         StopTween(_G.AutoFarmFruits)
+         
+      end)
+      
+      
+      
+         
+         
+         
         end)  
-                                          
+          
+          
+          
+          
+          local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+local camera = workspace.CurrentCamera
+local char = player.Character or player.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
+
+RunService.Heartbeat:Connect(function()
+if not _G.AutoFarmFruits2 then
+
+return
+
+end
+
+
+	local closestEnemy
+	local shortestDistance = math.huge
+
+	for _, enemy in pairs(workspace.Enemies:GetChildren()) do
+		if enemy:FindFirstChild("HumanoidRootPart") and enemy:FindFirstChildOfClass("Humanoid") and enemy:FindFirstChildOfClass("Humanoid").Health > 0 then
+			local dist = (enemy.HumanoidRootPart.Position - hrp.Position).Magnitude
+			if dist < shortestDistance then
+				shortestDistance = dist
+				closestEnemy = enemy
+			end
+		end
+	end
+
+	if closestEnemy then
+		local enemyPos = closestEnemy.HumanoidRootPart.Position
+		
+		if closestEnemy:FindFirstChildOfClass("Humanoid").Health / closestEnemy:FindFirstChildOfClass("Humanoid").MaxHealth > 0.2 then
+		
+		camera.CFrame = CFrame.new(camera.CFrame.Position, enemyPos)
+		topos(closestEnemy.HumanoidRootPart.CFrame * CFrame.new(12, 0, 0))
+		
+		
+		
+		EquipWeapon(_G.SelectWeapon)
+		_G.UseSkill = false
+		else
+		topos(closestEnemy.HumanoidRootPart.CFrame * CFrame.new(0, 25, 0))
+		_G.UseSkill = true
+		EquipWeapon(player.Data.DevilFruit.Value)
+		
+		end
+		
+		
+	end
+end)
+
 spawn(function()
-    while task.wait() do
-        if _G.UseSkill then
-            pcall(function()
-                for i, v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
-                 if v.Name == MonFarm 
-                 and v:FindFirstChild("Humanoid") 
-                 and v:FindFirstChild("HumanoidRootPart") 
-                 and v.Humanoid.Health <= v.Humanoid.MaxHealth * KillPercent / 100 then
-                 repeat
-                 game:GetService("RunService").Heartbeat:Wait()
-                 EquipWeapon(game.Players.LocalPlayer.Data.DevilFruit.Value)
-                 topos(v.HumanoidRootPart.CFrame * CFrame.new(0, 30, 0))
-                 PositionSkillMasteryDevilFruit = v.HumanoidRootPart.Position
-                 local char = game.Players.LocalPlayer.Character
-                 local fruitName = game.Players.LocalPlayer.Data.DevilFruit.Value
-                 local fruit = char:FindFirstChild(fruitName)
-                 if fruit then
-                 fruit.MousePos.Value = PositionSkillMasteryDevilFruit
-                 local DevilFruitMastery = fruit.Level.Value
-                 if SkillZ and DevilFruitMastery >= 1 then
-                 game:service("VirtualInputManager"):SendKeyEvent(true, "Z", false, game)
-                 wait()
-                 game:service("VirtualInputManager"):SendKeyEvent(false, "Z", false, game)
-                 end
-                 if SkillX and DevilFruitMastery >= 1 then
-                 game:service("VirtualInputManager"):SendKeyEvent(true, "X", false, game)
-                 wait()
-                 game:service("VirtualInputManager"):SendKeyEvent(false, "X", false, game)
-                 end
-                 if SkillC and DevilFruitMastery >= 1 then
-                 game:service("VirtualInputManager"):SendKeyEvent(true, "C", false, game)
-                 wait()
-                 game:service("VirtualInputManager"):SendKeyEvent(false, "C", false, game)
-                 end
-                 if SkillV and DevilFruitMastery >= 1 then
-                 game:service("VirtualInputManager"):SendKeyEvent(true, "V", false, game)
-                 wait()
-                 game:service("VirtualInputManager"):SendKeyEvent(false, "V", false, game)
-                 end
-                 if SkillF and DevilFruitMastery >= 1 then
-                 game:service("VirtualInputManager"):SendKeyEvent(true, "F", false, game)
-                 wait()
-                game:service("VirtualInputManager"):SendKeyEvent(false, "F", false, game)
-                end
-               end
-             until not _G.AutoFarmFruits or not _G.UseSkill or v.Humanoid.Health == 0
-             end
-            end
-           end)
-          end
-         end
-       end)
+	while task.wait() do
+		if _G.UseSkill then
+			pcall(function()
+				local closestEnemy
+				local shortestDistance = math.huge
+				local player = game.Players.LocalPlayer
+				local char = player.Character or player.CharacterAdded:Wait()
+				local hrp = char:WaitForChild("HumanoidRootPart")
+
+				for i, v in pairs(workspace.Enemies:GetChildren()) do
+					if v:FindFirstChild("Humanoid") 
+						and v:FindFirstChild("HumanoidRootPart") 
+						and v.Humanoid.Health > 0 then
+
+						local dist = (v.HumanoidRootPart.Position - hrp.Position).Magnitude
+						if dist < shortestDistance then
+							shortestDistance = dist
+							closestEnemy = v
+							
+						end
+					end
+				end
+
+				if closestEnemy then
+					repeat
+						game:GetService("RunService").Heartbeat:Wait()
+						EquipWeapon(player.Data.DevilFruit.Value)
+						topos(closestEnemy.HumanoidRootPart.CFrame * CFrame.new(0, 30, 0))
+						PositionSkillMasteryDevilFruit = closestEnemy.HumanoidRootPart.Position
+
+						local fruitName = player.Data.DevilFruit.Value
+						local fruit = char:FindFirstChild(fruitName)
+						if fruit then
+							fruit.MousePos.Value = PositionSkillMasteryDevilFruit
+							local DevilFruitMastery = fruit.Level.Value
+
+							if SkillZ and DevilFruitMastery >= 1 then
+								game:GetService("VirtualInputManager"):SendKeyEvent(true, "Z", false, game)
+								wait()
+								game:GetService("VirtualInputManager"):SendKeyEvent(false, "Z", false, game)
+							end
+							if SkillX and DevilFruitMastery >= 1 then
+								game:GetService("VirtualInputManager"):SendKeyEvent(true, "X", false, game)
+								wait()
+								game:GetService("VirtualInputManager"):SendKeyEvent(false, "X", false, game)
+							end
+							if SkillC and DevilFruitMastery >= 1 then
+								game:GetService("VirtualInputManager"):SendKeyEvent(true, "C", false, game)
+								wait()
+								game:GetService("VirtualInputManager"):SendKeyEvent(false, "C", false, game)
+							end
+							if SkillV and DevilFruitMastery >= 1 then
+								game:GetService("VirtualInputManager"):SendKeyEvent(true, "V", false, game)
+								wait()
+								game:GetService("VirtualInputManager"):SendKeyEvent(false, "V", false, game)
+							end
+							if SkillF and DevilFruitMastery >= 1 then
+								game:GetService("VirtualInputManager"):SendKeyEvent(true, "F", false, game)
+								wait()
+								game:GetService("VirtualInputManager"):SendKeyEvent(false, "F", false, game)
+							end
+						end
+					until not _G.AutoFarmFruits or not _G.UseSkill or closestEnemy.Humanoid.Health == 0
+				end
+			end)
+		end
+	end
+end)
 
 spawn(function()
     while wait() do
         if _G.AutoFarmFruits and _G.selectFruitFarm == 'Farm Level Mastery No Quest' then
             pcall(function()
+           if not (_G.POPH) then
                 CheckQuest()
                 TP1(CFrameQuest)
+                
+                end
             end)
+            
+            _G.POPH = Mon .. ""
+            
             for i, v in pairs(game.Workspace.Enemies:GetChildren()) do
                 if v:FindFirstChild("Humanoid") and v:FindFirstChild("HumanoidRootPart") then
                     if v.Name == Mon then
-                        repeat wait(_G.Fast_Delay)
+                       
+                       
+                       repeat wait(_G.Fast_Delay)
                             if v.Humanoid.Health <= v.Humanoid.MaxHealth * KillPercent / 100 then
                                 _G.UseSkill = true
                             else
                                 _G.UseSkill = false
-                                bringmob = true
+                                bringmob = false
                                 AutoHaki()
                                 EquipWeapon(_G.SelectWeapon)
-                                topos(v.HumanoidRootPart.CFrame * CFrame.new(0, 30, 0))
+                                
+                                local vu = game:GetService("VirtualUser")
+    vu:CaptureController()
+    vu:Button1Down(Vector2.new(1280, 672))
+    
+    
+                                topos(v.HumanoidRootPart.CFrame * CFrame.new(10, 0, 0))
+                                
+                                local cam = workspace.CurrentCamera
+
+		cam.CFrame = CFrame.new(cam.CFrame.Position, v.HumanoidRootPart.Position)
+	
+
+
                                 v.HumanoidRootPart.Size = Vector3.new(60, 60, 60)
                                 v.HumanoidRootPart.Transparency = 1
                                 v.Humanoid.WalkSpeed = 0
@@ -5111,7 +5240,22 @@ spawn(function()
                                         bringmob = true
                                         AutoHaki()
                                         EquipWeapon(_G.SelectWeapon)
-                                        topos(v.HumanoidRootPart.CFrame * CFrame.new(0, 30, 0))
+                                  
+                                  
+                                  local cam = workspace.CurrentCamera
+
+		cam.CFrame = CFrame.new(cam.CFrame.Position, v.HumanoidRootPart.Position)
+	
+
+      
+                                        
+                                        local vu = game:GetService("VirtualUser")
+    vu:CaptureController()
+    vu:Button1Down(Vector2.new(1280, 672))
+    
+    
+    
+                                        topos(v.HumanoidRootPart.CFrame * CFrame.new(10, 0, 0))
                                         v.HumanoidRootPart.Size = Vector3.new(60, 60, 60)
                                         v.HumanoidRootPart.Transparency = 1
                                         v.Humanoid.WalkSpeed = 0
