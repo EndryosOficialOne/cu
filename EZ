@@ -1264,6 +1264,7 @@ if mobileGui then
  DarkXQuake = true,
  Darkness = true,
  Snow = true,
+ Impact = true,
 }
 
 if allowedItems[equippedItem2] then
@@ -1360,6 +1361,15 @@ hotbarSlotsVerificar = {3}
 elseif equippedItem2 == "Magnet" then
 ATO = 1
 hotbarSlotsVerificar = {4}
+elseif equippedItem2 == "Ash" then
+ATO = 1
+hotbarSlotsVerificar = {2}
+elseif equippedItem2 == "DragonV2" then
+ATO = 1
+hotbarSlotsVerificar = {1}
+elseif equippedItem2 == "Ope" then
+ATO = 1
+hotbarSlotsVerificar = {2, 3}
 else
 ATO = 0
 hotbarSlotsVerificar = {}
@@ -1551,7 +1561,7 @@ end)
 end)
 
 if success then
-    notify("Sucesso! Resultado: " .. tostring(result))
+    
 else
     notify("ERRO DETECTADO! 😵‍💫\n" .. tostring(result))
 end
