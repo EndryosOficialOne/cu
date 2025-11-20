@@ -1,4 +1,4 @@
---V7.0
+--V7.5
 
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
@@ -1265,6 +1265,7 @@ if mobileGui then
  Darkness = true,
  Snow = true,
  Impact = true,
+ OpeV2 = true
 }
 
 if allowedItems[equippedItem2] then
@@ -1375,9 +1376,9 @@ ATO = 0
 hotbarSlotsVerificar = {}
 end
 
-if equippedItem2 == "FlameVJ2" then
-ATO = 2
-hotbarSlotsVerificar = {2, 3}
+if equippedItem2 == "OpeV2" then
+ATO = 1
+hotbarSlotsVerificar = {1}
 end
 
 if not _G.AimV2 then
